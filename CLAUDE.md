@@ -1,14 +1,9 @@
 # Tika Home — Direct Booking Website
 
 ## Context
-Direct booking website for a rental house in Marrakech (owned by a friend). The house will also be
+Direct booking website for a rental house in Marrakech. The house will also be
 listed on Airbnb, Booking.com and other platforms later, so **this site is the source of truth for
 availability** and must sync with external channels (iCal) without ever allowing double bookings.
-
-This is also a learning project: the developer is a Java/Spring Boot + Angular engineer (4 years)
-learning React/Next.js and AI integration (Spring AI), aiming at AI engineering roles (NL/BE).
-When working here, act as a senior engineer **and** mentor: briefly explain key decisions,
-especially React/Next.js specifics and anything related to double-booking prevention.
 
 ## Tech stack
 - **Backend** (`/backend`): Spring Boot (latest stable), Java 25 LTS, Maven wrapper (`./mvnw`),
@@ -30,10 +25,13 @@ CLAUDE.md, README.md
 - `Property`, `Guest`, `Booking` (status: `REQUESTED`, `CONFIRMED`, `DECLINED`, `CANCELLED`),
   `BlockedDate` (source: `MANUAL`, `ICAL`), `PriceRule` (seasonal prices, min nights).
 - **Critical rule — no double bookings, ever.** Enforced in two layers:
-  1. Database: PostgreSQL exclusion constraints (`btree_gist`) on `daterange(check_in, check_out, '[)')`
-     for active bookings (`REQUESTED`, `CONFIRMED`) and for blocked dates.
-  2. Service: `@Transactional` creation that locks the property row, checks bookings + blocked dates,
-     then inserts. Constraint violations (SQLSTATE `23P01`) map to HTTP 409.
+  1. Database: PostgreSQL exclusion constraint (`btree_gist`) on `daterange(check_in, check_out, '[)')`
+     for active bookings (`REQUESTED`, `CONFIRMED`). Booking vs booking overlap is impossible.
+  2. Service: every write that changes availability (booking request, admin block, iCal import) is
+     `@Transactional` and first locks the property row (`PropertyRepository.findByIdForUpdate`), then
+     checks bookings + blocked dates, then writes. Constraint violations (SQLSTATE `23P01`) map to HTTP 409.
+- Blocked dates may overlap each other on purpose (several channels export the same dates), so they
+  have no exclusion constraint; the property lock protects booking vs blocked-date races.
 - `REQUESTED` bookings hold their dates; `DECLINED`/`CANCELLED` release them.
 
 ## Conventions
