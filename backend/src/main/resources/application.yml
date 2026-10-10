@@ -20,3 +20,13 @@ spring:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+
+tikahome:
+  ical:
+    sync-enabled: true
+    sync-interval: PT15M   # how often Airbnb / Booking.com calendars are imported
+    initial-delay: PT30S
+    connect-timeout: PT10S
+    read-timeout: PT30S
+    max-feed-size: 2MB
+    allow-http: false
