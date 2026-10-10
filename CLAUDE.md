@@ -58,7 +58,7 @@ CLAUDE.md, README.md
 
 ## Commands
 ```bash
-docker compose up -d                 # start PostgreSQL
+docker compose up -d                 # start PostgreSQL on localhost:5433
 cd backend && ./mvnw verify          # build + all tests (needs Docker for Testcontainers)
 cd backend && ./mvnw spring-boot:run # API on :8080, Swagger UI at /swagger-ui.html
 cd web && npm run dev                # site on :3000
