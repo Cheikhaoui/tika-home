@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+:root {
+  --background: #fdfaf6;
+  --foreground: #1f1a17;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-latin), var(--font-arabic), system-ui, sans-serif;
+}
+
+/* Arabic text renders with the Arabic font first. */
+:lang(ar) {
+  --font-sans: var(--font-arabic), var(--font-latin), system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #14110f;
+    --foreground: #f2ede7;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}

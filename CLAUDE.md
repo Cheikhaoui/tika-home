@@ -9,7 +9,7 @@ availability** and must sync with external channels (iCal) without ever allowing
 - **Backend** (`/backend`): Spring Boot (latest stable), Java 25 LTS, Maven wrapper (`./mvnw`),
   Spring Data JPA, Flyway, Bean Validation, Spring Security (JWT, admin only — phase 5), springdoc-openapi
 - **Database**: PostgreSQL (`pgvector/pgvector` image, pgvector used in phase 7)
-- **Frontend** (`/web`): Next.js (App Router) + TypeScript + Tailwind CSS, next-intl for FR / EN / AR (RTL for Arabic)
+- **Frontend** (`/web`): Next.js (App Router) + TypeScript + Tailwind CSS, built-in i18n (`app/[lang]`, `next/root-params`, JSON dictionaries) for FR / EN / AR (RTL for Arabic)
 - **Local dev**: Docker Compose
 - **Tests**: JUnit 5, Mockito, Testcontainers
 
@@ -41,6 +41,11 @@ CLAUDE.md, README.md
 - Money: `BigDecimal` + ISO currency code; prices are always computed server-side.
 - IDs: UUID. Errors: RFC 9457 `ProblemDetail`.
 - Schema changes only through new Flyway migrations (never edit an applied one).
+- Web: Next.js 16 differs from older versions (`proxy.ts` replaces `middleware.ts`, Cache Components on,
+  root params). Before writing Next.js code, read the relevant guide in `web/node_modules/next/dist/docs/`
+  (see `web/AGENTS.md`). Server Components by default; add `"use client"` only for interactivity.
+  Translations live in `web/src/app/[lang]/dictionaries/*.json` (en.json defines the shape).
+  Use logical Tailwind utilities (`ms-*`, `ps-*`, `start-*`) instead of left/right so RTL works.
 - Small commits, Conventional Commit messages (`feat(backend): …`, `test: …`, `docs: …`).
 - Don't build features from a later phase without asking.
 
