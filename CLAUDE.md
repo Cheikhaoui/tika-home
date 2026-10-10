@@ -33,6 +33,21 @@ CLAUDE.md, README.md
 - Blocked dates may overlap each other on purpose (several channels export the same dates), so they
   have no exclusion constraint; the property lock protects booking vs blocked-date races.
 - `REQUESTED` bookings hold their dates; `DECLINED`/`CANCELLED` release them.
+- `Channel` = an external platform (Airbnb, Booking.com, ...). Its iCal feed is imported every 15 min
+  as `ICAL` blocked dates, diffed by event UID (`ChannelSyncService`): download outside any transaction,
+  then apply under the property lock; a failed download keeps existing blocks.
+- iCal export (`/ical/{token}.ics`): active bookings (REQUESTED + CONFIRMED) + MANUAL blocks, never
+  ICAL blocks (no echo), never personal data. The token and channel import URLs are secrets: never log them.
+
+## Double-booking conflict policy (cross-platform)
+iCal lags by hours, so a platform reservation can overlap a direct booking. The software never
+auto-cancels anything: it imports the platform reservation (it is confirmed and paid there), flags the
+conflict (`DOUBLE BOOKING` log + `channel.last_conflict_count`) and alerts the owner (email in phase 3).
+Recommended resolution shown to the owner (phase 5 admin):
+- direct booking still `REQUESTED` -> decline ours politely with alternative dates (no platform penalty);
+- direct booking `CONFIRMED` (it came first) -> first come, first served, but cancelling on Airbnb has
+  penalties: owner relocates one guest to equivalent accommodation, or cancels on the platform.
+- Before the owner confirms a request (phase 5), re-sync channels first to close the gap.
 
 ## Conventions
 - Backend packages by layer under `com.tikahome`:
@@ -54,12 +69,12 @@ CLAUDE.md, README.md
 - Don't build features from a later phase without asking.
 
 ## Roadmap
-1. **Project setup + backend core** — entities, migrations, availability + quote + booking request API  ← current
-2. Channel sync — iCal import (scheduled job, Airbnb / Booking.com / others) and iCal export endpoint
-3. Email notifications (guest + owner)
+1. ✅ Project setup + backend core — entities, migrations, availability + quote + booking request API
+2. ✅ Channel sync — iCal import (scheduled job, Airbnb / Booking.com / others) and iCal export endpoint
+3. Email notifications (guest + owner, incl. double-booking alerts)  ← next
 4. Public website — gallery, availability calendar, price calculator, booking form, WhatsApp button, FR/EN/AR, SEO
 5. Admin dashboard — login (JWT), accept/decline bookings, block dates, manage prices
-6. Deployment — Docker, GitHub Actions CI, cloud hosting
+6. Deployment — Docker, GitHub Actions CI, cloud hosting (+ ShedLock for scheduled jobs)
 7. AI guest assistant — Spring AI + RAG (pgvector) answering guest questions in their language
 8. Later — online payments
 

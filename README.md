@@ -65,6 +65,42 @@ curl -X POST localhost:8081/api/bookings -H 'Content-Type: application/json' -d 
 
 Errors use [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) problem details.
 
+## Calendar sync with Airbnb / Booking.com (iCal)
+
+**Import:** every 15 minutes (`tikahome.ical.sync-interval`) the API downloads each enabled channel's
+iCal feed and stores its reservations as blocked dates (`source = ICAL`). Cancelled reservations
+disappear at the next sync. A failed download keeps the existing blocks.
+
+Until the admin dashboard exists (phase 5), add a channel with SQL. Get the URL from
+Airbnb (*Calendar → Availability → Connect calendars → Export*) or Booking.com
+(*Rates & Availability → Sync calendars → Export*):
+
+```bash
+docker exec -it tikahome-postgres psql -U tikahome -d tikahome -c "
+  insert into channel (id, property_id, type, name, import_url)
+  values (gen_random_uuid(), '6f1c2b8e-4d3a-4f5e-9a7b-1c2d3e4f5a6b', 'AIRBNB', 'Airbnb',
+          'https://www.airbnb.com/calendar/ical/....ics?s=...');"
+```
+
+`type` is one of `AIRBNB`, `BOOKING_COM`, `VRBO`, `OTHER`. Check the result in the `channel` table
+(`last_sync_status`, `last_error`, `last_conflict_count`).
+
+**Export:** our calendar (active bookings + manual blocks, no personal data) is published at
+`/ical/{token}.ics`. Get the URL with:
+
+```bash
+docker exec tikahome-postgres psql -U tikahome -d tikahome -tA -c \
+  "select 'http://localhost:8081/ical/' || ical_export_token || '.ics' from property"
+```
+
+Paste it into Airbnb / Booking.com (*Import calendar*). The platforms must reach it over the internet,
+so this only works once the API is deployed (phase 6); `localhost` is only for testing.
+
+**Double bookings across platforms:** iCal is refreshed every few hours by the platforms, so a guest
+can occasionally book the same dates elsewhere before the calendars catch up. The sync then imports
+the reservation anyway (it is confirmed there) and logs a `DOUBLE BOOKING` warning plus
+`last_conflict_count` on the channel. See the conflict policy in [CLAUDE.md](CLAUDE.md).
+
 ## Tests
 
 ```bash
@@ -76,6 +112,8 @@ Docker must be running. Key tests:
 
 - `BookingNoOverlapConstraintIT`: raw SQL inserts prove the **database** rejects overlapping bookings.
 - `BookingApiIT`: end to end over HTTP, including 10 concurrent requests for the same dates → exactly one booking.
+- `ChannelSyncIT`: iCal import against a fake Airbnb server (create / update / delete, outages, conflicts).
+- `IcalExportIT`: the exported calendar parses back correctly and contains no personal data.
 
 ```bash
 cd web
