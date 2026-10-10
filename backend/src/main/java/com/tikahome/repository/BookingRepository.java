@@ -22,4 +22,13 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
             order by b.checkIn
             """)
     List<Booking> findOverlapping(UUID propertyId, LocalDate from, LocalDate to, Collection<BookingStatus> statuses);
+
+    @Query("""
+            select b from Booking b
+            where b.property.id = :propertyId
+              and b.status in :statuses
+              and b.checkOut > :from
+            order by b.checkIn
+            """)
+    List<Booking> findEndingAfter(UUID propertyId, LocalDate from, Collection<BookingStatus> statuses);
 }

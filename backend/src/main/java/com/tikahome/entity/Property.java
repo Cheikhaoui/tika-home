@@ -6,13 +6,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
+import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.HexFormat;
 import java.util.UUID;
 
 @Entity
 @Table(name = "property")
 public class Property {
+
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     @Id
     private UUID id;
@@ -41,6 +45,10 @@ public class Property {
     @Column(name = "time_zone", nullable = false, length = 64)
     private String timeZone;
 
+    /** Secret part of the public iCal export URL: /ical/{token}.ics */
+    @Column(name = "ical_export_token", nullable = false, unique = true, length = 64)
+    private String icalExportToken;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -59,7 +67,14 @@ public class Property {
         this.currency = currency;
         this.minNights = minNights;
         this.timeZone = "Africa/Casablanca";
+        this.icalExportToken = newExportToken();
         this.createdAt = Instant.now();
+    }
+
+    private static String newExportToken() {
+        byte[] bytes = new byte[32];
+        RANDOM.nextBytes(bytes);
+        return HexFormat.of().formatHex(bytes);
     }
 
     public UUID getId() { return id; }
@@ -71,4 +86,5 @@ public class Property {
     public String getCurrency() { return currency; }
     public int getMinNights() { return minNights; }
     public ZoneId getZoneId() { return ZoneId.of(timeZone); }
+    public String getIcalExportToken() { return icalExportToken; }
 }

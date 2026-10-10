@@ -12,6 +12,7 @@ import jakarta.persistence.Table;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -40,9 +41,12 @@ public class BlockedDate {
     @Column(nullable = false, length = 20)
     private BlockSource source;
 
-    @Column(name = "channel_id")
-    private UUID channelId;
+    /** Set for ICAL blocks only. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "channel_id")
+    private Channel channel;
 
+    /** iCal VEVENT UID of an imported block, unique per channel. */
     @Column(name = "external_uid")
     private String externalUid;
 
@@ -65,9 +69,36 @@ public class BlockedDate {
         return b;
     }
 
+    /** A reservation or block imported from an external channel's iCal feed. */
+    public static BlockedDate imported(Channel channel, String externalUid, LocalDate startDate, LocalDate endDate,
+                                       String reason) {
+        BlockedDate b = new BlockedDate();
+        b.id = UUID.randomUUID();
+        b.property = channel.getProperty();
+        b.channel = channel;
+        b.externalUid = externalUid;
+        b.startDate = startDate;
+        b.endDate = endDate;
+        b.reason = reason;
+        b.source = BlockSource.ICAL;
+        b.createdAt = Instant.now();
+        return b;
+    }
+
+    /** Applies new dates/summary from a re-sync; returns true if anything changed. */
+    public boolean update(LocalDate newStart, LocalDate newEnd, String newReason) {
+        boolean changed = !newStart.equals(startDate) || !newEnd.equals(endDate)
+                || !Objects.equals(newReason, reason);
+        startDate = newStart;
+        endDate = newEnd;
+        reason = newReason;
+        return changed;
+    }
+
     public UUID getId() { return id; }
     public LocalDate getStartDate() { return startDate; }
     public LocalDate getEndDate() { return endDate; }
     public String getReason() { return reason; }
     public BlockSource getSource() { return source; }
+    public String getExternalUid() { return externalUid; }
 }
