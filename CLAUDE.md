@@ -35,8 +35,12 @@ CLAUDE.md, README.md
 - `REQUESTED` bookings hold their dates; `DECLINED`/`CANCELLED` release them.
 
 ## Conventions
-- Backend packages by feature: `com.tikahome.<feature>` (`property`, `booking`, `availability`,
-  `pricing`, `guest`, `common`). DTOs are Java `record`s; entities never leave the service layer.
+- Backend packages by layer under `com.tikahome`:
+  `config`, `controller`, `dto` (API request/response records), `entity` (JPA entities + enums),
+  `exception` (custom exceptions + `ApiExceptionHandler`), `model` (non-entity domain types such as
+  `DateRange`, `Quote`, `Availability`), `repository`, `service`. Tests mirror these packages;
+  Testcontainers integration tests (`*IT`) live in `integration`.
+- Controllers only map HTTP <-> DTOs and call services; entities are never returned by controllers.
 - Dates: `LocalDate`, half-open ranges `[checkIn, checkOut)`; property timezone `Africa/Casablanca`.
 - Money: `BigDecimal` + ISO currency code; prices are always computed server-side.
 - IDs: UUID. Errors: RFC 9457 `ProblemDetail`.
