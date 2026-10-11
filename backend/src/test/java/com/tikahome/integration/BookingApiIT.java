@@ -72,6 +72,7 @@ class BookingApiIT {
         assertThat(response.statusCode()).isEqualTo(201);
         assertThat(response.body())
                 .contains("\"status\":\"REQUESTED\"")
+                .containsPattern("\"reference\":\"TK-[0-9A-F]{6}\"")
                 .contains("\"totalPrice\":340.00"); // 3 x 100 + 40 cleaning
     }
 
