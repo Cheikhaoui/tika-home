@@ -42,6 +42,7 @@ class BookingServiceTest {
     @Mock GuestRepository guests;
     @Mock BookingRepository bookings;
     @Mock QuoteService quoteService;
+    @Mock NotificationService notifications;
     @InjectMocks BookingService service;
 
     final Property property = new Property("test", "Test", 6, new BigDecimal("100.00"),
@@ -61,7 +62,7 @@ class BookingServiceTest {
                 .isInstanceOf(BookingRejectedException.class)
                 .satisfies(ex -> assertThat(((BookingRejectedException) ex).isDateConflict()).isTrue());
         verify(bookings, never()).saveAndFlush(any());
-        verifyNoInteractions(guests);
+        verifyNoInteractions(guests, notifications);
     }
 
     @Test
@@ -77,6 +78,7 @@ class BookingServiceTest {
         assertThat(booking.getTotalPrice()).isEqualByComparingTo("300.00");
         assertThat(booking.getGuest().getFullName()).isEqualTo("Jane Doe");
         assertThat(booking.getGuest().getEmail()).isEqualTo("jane@example.com");
+        verify(notifications).bookingRequested(booking);
     }
 
     private Quote quote(Set<QuoteIssue> issues) {

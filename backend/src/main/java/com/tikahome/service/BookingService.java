@@ -23,13 +23,16 @@ public class BookingService {
     private final GuestRepository guests;
     private final BookingRepository bookings;
     private final QuoteService quoteService;
+    private final NotificationService notifications;
 
     public BookingService(PropertyRepository properties, GuestRepository guests,
-                          BookingRepository bookings, QuoteService quoteService) {
+                          BookingRepository bookings, QuoteService quoteService,
+                          NotificationService notifications) {
         this.properties = properties;
         this.guests = guests;
         this.bookings = bookings;
         this.quoteService = quoteService;
+        this.notifications = notifications;
     }
 
     /**
@@ -55,7 +58,9 @@ public class BookingService {
         var g = request.guest();
         Guest guest = guests.save(new Guest(g.fullName().strip(), g.email().strip().toLowerCase(),
                 g.phone(), g.language()));
-        return bookings.saveAndFlush(Booking.request(property, guest, stay.start(), stay.end(),
+        Booking booking = bookings.saveAndFlush(Booking.request(property, guest, stay.start(), stay.end(),
                 request.guests(), quote.total(), request.message()));
+        notifications.bookingRequested(booking); // queued in this transaction: no booking, no email
+        return booking;
     }
 }
