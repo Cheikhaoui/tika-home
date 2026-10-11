@@ -23,5 +23,162 @@
   "footer": {
     "contact": "Contact",
     "rights": "Direct booking with the owner."
+  },
+  "hero": {
+    "eyebrow": "Riad in the Marrakech medina",
+    "title": "Your private riad in the heart of Marrakech",
+    "subtitle": "Three bedrooms around a courtyard with a plunge pool, a sunny roof terrace, and the souks ten minutes away on foot.",
+    "ctaBook": "Check availability",
+    "ctaPhotos": "See the photos",
+    "photoAlt": "The riad courtyard with its tiled floor and carved arches"
+  },
+  "house": {
+    "title": "The house",
+    "intro": "A traditional riad restored with care and rented in its entirety: the whole house is yours.",
+    "paragraphs": [
+      "Behind a discreet door in a quiet lane of the medina, the house opens onto a bright courtyard with a plunge pool, orange trees and zellige tiles.",
+      "The three bedrooms each have their own character, two bathrooms are shared between them, and the roof terrace is the perfect place for breakfast in the sun or a drink at sunset."
+    ],
+    "facts": {
+      "guests": {
+        "one": "{count} guest",
+        "other": "{count} guests"
+      },
+      "bedrooms": {
+        "one": "{count} bedroom",
+        "other": "{count} bedrooms"
+      },
+      "bathrooms": {
+        "one": "{count} bathroom",
+        "other": "{count} bathrooms"
+      },
+      "beds": {
+        "one": "{count} bed",
+        "other": "{count} beds"
+      }
+    },
+    "checkIn": "Check-in from {time}",
+    "checkOut": "Check-out until {time}"
+  },
+  "amenities": {
+    "title": "Amenities",
+    "intro": "Everything you need for a comfortable stay.",
+    "items": {
+      "wifi": {
+        "title": "Fast Wi-Fi",
+        "text": "Fibre connection throughout the house."
+      },
+      "aircon": {
+        "title": "Air conditioning",
+        "text": "In every bedroom and in the living room."
+      },
+      "pool": {
+        "title": "Plunge pool",
+        "text": "A private pool in the courtyard."
+      },
+      "terrace": {
+        "title": "Roof terrace",
+        "text": "Sun loungers and a dining area with medina views."
+      },
+      "kitchen": {
+        "title": "Equipped kitchen",
+        "text": "Oven, fridge, coffee machine and everything to cook."
+      },
+      "washer": {
+        "title": "Washing machine",
+        "text": "Plus an iron and a drying rack."
+      },
+      "linens": {
+        "title": "Linen and towels",
+        "text": "Beds made on arrival, bath and pool towels provided."
+      },
+      "breakfast": {
+        "title": "Breakfast on request",
+        "text": "Moroccan breakfast served on the terrace."
+      },
+      "transfer": {
+        "title": "Airport transfer",
+        "text": "Pick-up at Marrakech airport on request."
+      }
+    }
+  },
+  "gallery": {
+    "title": "Photos",
+    "intro": "Take a look inside the house.",
+    "open": "Open photo {index} of {total}",
+    "dialogLabel": "Photo viewer",
+    "close": "Close",
+    "next": "Next photo",
+    "previous": "Previous photo",
+    "counter": "{index} / {total}",
+    "placeholderNote": "Placeholder photos by {authors} on Unsplash.",
+    "alt": {
+      "courtyard": "Riad courtyard with a tiled floor and carved arches",
+      "poolDoor": "Plunge pool in the courtyard in front of a carved wooden door",
+      "bedroom": "Bedroom with a large bed and soft textiles",
+      "fountain": "Tiled fountain in the middle of the courtyard",
+      "lounge": "Living room with plants and a Berber rug",
+      "poolPalms": "Pool with a green door surrounded by palm trees",
+      "terrace": "Sun loungers on the roof terrace",
+      "doorway": "Ornate doorway with curtains",
+      "living": "Lounge corner with a round wooden table and poufs",
+      "poolCourtyard": "Courtyard with pool, carved door and armchairs",
+      "garden": "Shaded courtyard with fruit trees and tables"
+    }
+  },
+  "location": {
+    "title": "Location",
+    "intro": "In a quiet lane of the medina, close to everything.",
+    "places": {
+      "jemaa": "Jemaa el-Fna square: 10 min walk",
+      "souks": "Souks: 5 min walk",
+      "koutoubia": "Koutoubia Mosque: 12 min walk",
+      "majorelle": "Jardin Majorelle: 15 min by taxi",
+      "airport": "Marrakech Menara airport: 20 min by car"
+    },
+    "arrivalTitle": "Arriving",
+    "arrival": "Cars cannot enter the narrow lanes of the medina. We meet you at the nearest drop-off point and walk with you to the house.",
+    "mapLink": "Open in Google Maps",
+    "photoAlt": "The Koutoubia minaret with the Atlas Mountains behind"
+  },
+  "rules": {
+    "title": "House rules",
+    "items": [
+      "Check-in from {checkIn}, check-out until {checkOut}",
+      "No smoking inside the house",
+      "No parties or events",
+      "Quiet hours from 22:00 to 08:00",
+      "Pets are not allowed",
+      "Children are welcome (the pool is not fenced, please supervise them)"
+    ]
+  },
+  "faq": {
+    "title": "Frequently asked questions",
+    "items": [
+      {
+        "q": "Do I pay when I send a request?",
+        "a": "No. Your request is free and without commitment. The owner confirms within 24 hours and then explains how to pay."
+      },
+      {
+        "q": "Why book here rather than on Airbnb?",
+        "a": "Booking directly is cheaper: there are no platform service fees, and you talk to the owner directly."
+      },
+      {
+        "q": "Can you organise an airport transfer?",
+        "a": "Yes, on request. Just mention it in your message when you book."
+      },
+      {
+        "q": "Is breakfast included?",
+        "a": "Breakfast can be served on the terrace on request for a small extra charge."
+      },
+      {
+        "q": "How do I find the house?",
+        "a": "We send you precise directions before your arrival and meet you at the nearest drop-off point."
+      },
+      {
+        "q": "What is the cancellation policy?",
+        "a": "Free cancellation up to 14 days before arrival (placeholder: to be confirmed by the owner)."
+      }
+    ]
   }
 }

@@ -23,5 +23,162 @@
   "footer": {
     "contact": "Contact",
     "rights": "Réservation directe avec le propriétaire."
+  },
+  "hero": {
+    "eyebrow": "Riad dans la médina de Marrakech",
+    "title": "Votre riad privé au cœur de Marrakech",
+    "subtitle": "Trois chambres autour d’un patio avec piscine, une terrasse ensoleillée sur le toit, et les souks à dix minutes à pied.",
+    "ctaBook": "Voir les disponibilités",
+    "ctaPhotos": "Voir les photos",
+    "photoAlt": "Le patio du riad avec son sol en zellige et ses arches sculptées"
+  },
+  "house": {
+    "title": "La maison",
+    "intro": "Un riad traditionnel restauré avec soin et loué en entier : toute la maison est à vous.",
+    "paragraphs": [
+      "Derrière une porte discrète, dans une ruelle calme de la médina, la maison s’ouvre sur un patio lumineux avec piscine, orangers et zelliges.",
+      "Les trois chambres ont chacune leur caractère, deux salles de bain sont partagées entre elles, et la terrasse sur le toit est l’endroit idéal pour un petit-déjeuner au soleil ou un verre au coucher du soleil."
+    ],
+    "facts": {
+      "guests": {
+        "one": "{count} voyageur",
+        "other": "{count} voyageurs"
+      },
+      "bedrooms": {
+        "one": "{count} chambre",
+        "other": "{count} chambres"
+      },
+      "bathrooms": {
+        "one": "{count} salle de bain",
+        "other": "{count} salles de bain"
+      },
+      "beds": {
+        "one": "{count} lit",
+        "other": "{count} lits"
+      }
+    },
+    "checkIn": "Arrivée à partir de {time}",
+    "checkOut": "Départ jusqu’à {time}"
+  },
+  "amenities": {
+    "title": "Équipements",
+    "intro": "Tout ce qu’il faut pour un séjour confortable.",
+    "items": {
+      "wifi": {
+        "title": "Wi-Fi rapide",
+        "text": "Connexion fibre dans toute la maison."
+      },
+      "aircon": {
+        "title": "Climatisation",
+        "text": "Dans chaque chambre et dans le salon."
+      },
+      "pool": {
+        "title": "Piscine",
+        "text": "Une piscine privée dans le patio."
+      },
+      "terrace": {
+        "title": "Terrasse sur le toit",
+        "text": "Transats et coin repas avec vue sur la médina."
+      },
+      "kitchen": {
+        "title": "Cuisine équipée",
+        "text": "Four, réfrigérateur, machine à café et tout pour cuisiner."
+      },
+      "washer": {
+        "title": "Lave-linge",
+        "text": "Avec fer à repasser et étendoir."
+      },
+      "linens": {
+        "title": "Linge de maison",
+        "text": "Lits faits à l’arrivée, serviettes de bain et de piscine fournies."
+      },
+      "breakfast": {
+        "title": "Petit-déjeuner sur demande",
+        "text": "Petit-déjeuner marocain servi sur la terrasse."
+      },
+      "transfer": {
+        "title": "Transfert aéroport",
+        "text": "Accueil à l’aéroport de Marrakech sur demande."
+      }
+    }
+  },
+  "gallery": {
+    "title": "Photos",
+    "intro": "Un aperçu de l’intérieur de la maison.",
+    "open": "Ouvrir la photo {index} sur {total}",
+    "dialogLabel": "Visionneuse de photos",
+    "close": "Fermer",
+    "next": "Photo suivante",
+    "previous": "Photo précédente",
+    "counter": "{index} / {total}",
+    "placeholderNote": "Photos d’illustration par {authors} sur Unsplash.",
+    "alt": {
+      "courtyard": "Patio du riad avec sol en zellige et arches sculptées",
+      "poolDoor": "Piscine du patio devant une porte en bois sculpté",
+      "bedroom": "Chambre avec un grand lit et des textiles doux",
+      "fountain": "Fontaine en zellige au milieu du patio",
+      "lounge": "Salon avec des plantes et un tapis berbère",
+      "poolPalms": "Piscine avec une porte verte entourée de palmiers",
+      "terrace": "Transats sur la terrasse du toit",
+      "doorway": "Porte ouvragée avec rideaux",
+      "living": "Coin salon avec une table ronde en bois et des poufs",
+      "poolCourtyard": "Patio avec piscine, porte sculptée et fauteuils",
+      "garden": "Patio ombragé avec arbres fruitiers et tables"
+    }
+  },
+  "location": {
+    "title": "Emplacement",
+    "intro": "Dans une ruelle calme de la médina, proche de tout.",
+    "places": {
+      "jemaa": "Place Jemaa el-Fna : 10 min à pied",
+      "souks": "Souks : 5 min à pied",
+      "koutoubia": "Mosquée Koutoubia : 12 min à pied",
+      "majorelle": "Jardin Majorelle : 15 min en taxi",
+      "airport": "Aéroport Marrakech-Ménara : 20 min en voiture"
+    },
+    "arrivalTitle": "Votre arrivée",
+    "arrival": "Les voitures ne peuvent pas entrer dans les ruelles de la médina. Nous vous retrouvons au point de dépose le plus proche et vous accompagnons à pied jusqu’à la maison.",
+    "mapLink": "Ouvrir dans Google Maps",
+    "photoAlt": "Le minaret de la Koutoubia avec l’Atlas en arrière-plan"
+  },
+  "rules": {
+    "title": "Règlement intérieur",
+    "items": [
+      "Arrivée à partir de {checkIn}, départ jusqu’à {checkOut}",
+      "Interdiction de fumer à l’intérieur",
+      "Pas de fêtes ni d’événements",
+      "Calme entre 22 h et 8 h",
+      "Animaux non admis",
+      "Enfants bienvenus (la piscine n’est pas clôturée, merci de les surveiller)"
+    ]
+  },
+  "faq": {
+    "title": "Questions fréquentes",
+    "items": [
+      {
+        "q": "Dois-je payer en envoyant ma demande ?",
+        "a": "Non. Votre demande est gratuite et sans engagement. Le propriétaire confirme sous 24 heures puis vous explique comment régler."
+      },
+      {
+        "q": "Pourquoi réserver ici plutôt que sur Airbnb ?",
+        "a": "La réservation directe est moins chère : pas de frais de service de plateforme, et vous échangez directement avec le propriétaire."
+      },
+      {
+        "q": "Pouvez-vous organiser un transfert depuis l’aéroport ?",
+        "a": "Oui, sur demande. Indiquez-le simplement dans votre message lors de la réservation."
+      },
+      {
+        "q": "Le petit-déjeuner est-il inclus ?",
+        "a": "Le petit-déjeuner peut être servi sur la terrasse sur demande, avec un petit supplément."
+      },
+      {
+        "q": "Comment trouver la maison ?",
+        "a": "Nous vous envoyons un itinéraire précis avant votre arrivée et vous retrouvons au point de dépose le plus proche."
+      },
+      {
+        "q": "Quelles sont les conditions d’annulation ?",
+        "a": "Annulation gratuite jusqu’à 14 jours avant l’arrivée (à confirmer par le propriétaire)."
+      }
+    ]
   }
 }
