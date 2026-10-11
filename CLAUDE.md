@@ -39,10 +39,16 @@ CLAUDE.md, README.md
 - iCal export (`/ical/{token}.ics`): active bookings (REQUESTED + CONFIRMED) + MANUAL blocks, never
   ICAL blocks (no echo), never personal data. The token and channel import URLs are secrets: never log them.
 
+- Emails use the **transactional outbox**: `NotificationService` renders the email and queues it in
+  `email_outbox` inside the business transaction (`Propagation.MANDATORY`); `EmailSender` sends due rows
+  (`FOR UPDATE SKIP LOCKED`) with retries. Never send SMTP directly from business code. Alerts that can
+  repeat use a `dedupe_key`. Guest emails follow `guest.preferred_language`; owner emails are English.
+  Email texts: `i18n/emails*.properties`, use the typographic apostrophe ’ only.
+
 ## Double-booking conflict policy (cross-platform)
 iCal lags by hours, so a platform reservation can overlap a direct booking. The software never
 auto-cancels anything: it imports the platform reservation (it is confirmed and paid there), flags the
-conflict (`DOUBLE BOOKING` log + `channel.last_conflict_count`) and alerts the owner (email in phase 3).
+conflict (`DOUBLE BOOKING` log + `channel.last_conflict_count`) and emails the owner once per conflict.
 Recommended resolution shown to the owner (phase 5 admin):
 - direct booking still `REQUESTED` -> decline ours politely with alternative dates (no platform penalty);
 - direct booking `CONFIRMED` (it came first) -> first come, first served, but cancelling on Airbnb has
@@ -71,16 +77,16 @@ Recommended resolution shown to the owner (phase 5 admin):
 ## Roadmap
 1. ✅ Project setup + backend core — entities, migrations, availability + quote + booking request API
 2. ✅ Channel sync — iCal import (scheduled job, Airbnb / Booking.com / others) and iCal export endpoint
-3. Email notifications (guest + owner, incl. double-booking alerts)  ← next
-4. Public website — gallery, availability calendar, price calculator, booking form, WhatsApp button, FR/EN/AR, SEO
-5. Admin dashboard — login (JWT), accept/decline bookings, block dates, manage prices
-6. Deployment — Docker, GitHub Actions CI, cloud hosting (+ ShedLock for scheduled jobs)
+3. ✅ Email notifications (guest + owner, incl. double-booking and sync-failure alerts)
+4. Public website — gallery, availability calendar, price calculator, booking form, WhatsApp button, FR/EN/AR, SEO  ← next
+5. Admin dashboard — login (JWT), accept/decline bookings (+ confirmed/declined emails to guest), block dates, manage prices
+6. Deployment — Docker, GitHub Actions CI, cloud hosting (+ ShedLock for scheduled jobs, real SMTP provider)
 7. AI guest assistant — Spring AI + RAG (pgvector) answering guest questions in their language
 8. Later — online payments
 
 ## Commands
 ```bash
-docker compose up -d                 # start PostgreSQL on localhost:5433
+docker compose up -d                 # PostgreSQL on localhost:5433, Mailpit inbox on localhost:8025
 cd backend && ./mvnw verify          # build + all tests (needs Docker for Testcontainers)
 cd backend && ./mvnw spring-boot:run # API on :8081, Swagger UI at /swagger-ui.html
 cd web && npm run dev                # site on :3000

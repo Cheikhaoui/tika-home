@@ -18,7 +18,7 @@ See [CLAUDE.md](CLAUDE.md) for conventions and the roadmap.
 ## Run locally
 
 ```bash
-# 1. Database (PostgreSQL 17 + pgvector) on localhost:5433
+# 1. Database (PostgreSQL 17 + pgvector) on localhost:5433 and Mailpit (fake email inbox) on localhost:8025
 docker compose up -d
 
 # 2. API on http://localhost:8081 (Flyway creates the schema and a seed property on startup)
@@ -32,6 +32,7 @@ npm run dev
 ```
 
 API docs: http://localhost:8081/swagger-ui.html
+Emails (local inbox, nothing is really sent): http://localhost:8025
 
 > Ports 5433 / 8081 are used (instead of 5432 / 8080) to avoid clashing with other local projects.
 
@@ -101,6 +102,23 @@ can occasionally book the same dates elsewhere before the calendars catch up. Th
 the reservation anyway (it is confirmed there) and logs a `DOUBLE BOOKING` warning plus
 `last_conflict_count` on the channel. See the conflict policy in [CLAUDE.md](CLAUDE.md).
 
+## Emails
+
+| When | To | Language |
+|---|---|---|
+| Booking request | guest (reply goes to the owner) | guest’s language (FR / EN / AR, RTL) |
+| Booking request | owner (reply goes to the guest) | English |
+| Double booking detected by the sync | owner, once per conflict | English |
+| A channel failed 3 syncs in a row / recovered | owner, once each | English |
+
+Emails are written to the `email_outbox` table **in the same transaction** as the booking or sync,
+then sent by a background job every 30 s with retries (1 min, 5 min, 30 min, 2 h, then `FAILED`).
+A booking never fails because of email, and no email is lost if the mail server is down.
+
+Locally, Mailpit (from `docker compose up -d`) catches everything at http://localhost:8025.
+Settings live under `tikahome.notifications` in `application.yml` (owner address, owner language).
+Texts: `backend/src/main/resources/i18n/emails*.properties`; templates: `templates/email/`.
+
 ## Tests
 
 ```bash
@@ -114,6 +132,7 @@ Docker must be running. Key tests:
 - `BookingApiIT`: end to end over HTTP, including 10 concurrent requests for the same dates → exactly one booking.
 - `ChannelSyncIT`: iCal import against a fake Airbnb server (create / update / delete, outages, conflicts).
 - `IcalExportIT`: the exported calendar parses back correctly and contains no personal data.
+- `EmailOutboxIT` / `BookingEmailIT`: emails over a real SMTP test server (GreenMail), retries, dedupe.
 
 ```bash
 cd web
