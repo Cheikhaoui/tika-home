@@ -1,0 +1,6 @@
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{email/layout :: email(~{::content})}">
+<div th:fragment="content">
+  <p style="font-weight:bold;color:#067647;" th:text="#{sync.recovered.owner.title(${channelName})}">Syncing again</p>
+  <p th:text="#{sync.recovered.owner.intro(${channelName})}">The calendar is syncing normally again.</p>
+</div>
+</html>

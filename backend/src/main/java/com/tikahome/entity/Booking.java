@@ -15,6 +15,7 @@ import jakarta.persistence.Version;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Locale;
 import java.util.UUID;
 
 @Entity
@@ -101,6 +102,14 @@ public class Booking {
     @PreUpdate
     void touch() {
         updatedAt = Instant.now();
+    }
+
+    /**
+     * Short reference for emails and phone calls, e.g. TK-7F3A2B (from the UUID, so no extra column).
+     * Display only: not guaranteed unique, never use it to look a booking up.
+     */
+    public String getReference() {
+        return "TK-" + id.toString().substring(0, 6).toUpperCase(Locale.ROOT);
     }
 
     public UUID getId() { return id; }

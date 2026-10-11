@@ -55,6 +55,7 @@ class EmailOutboxIT {
         assertThat(received).hasSize(1);
         assertThat(received[0].getSubject()).isEqualTo("تم استلام طلبك");
         assertThat(received[0].getAllRecipients()[0].toString()).isEqualTo("guest@example.com");
+        assertThat(received[0].getReplyTo()[0].toString()).isEqualTo("cheikhaoui.hicham@gmail.com");
         // getContent() decodes the transfer encoding (quoted-printable) back to the original UTF-8 text.
         assertThat((String) received[0].getContent()).contains("dir=\"rtl\"", "شكرا");
         assertThat(outbox.findAll()).singleElement().satisfies(e -> {

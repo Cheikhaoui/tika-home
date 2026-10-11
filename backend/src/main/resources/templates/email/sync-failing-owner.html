@@ -1,0 +1,9 @@
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{email/layout :: email(~{::content})}">
+<div th:fragment="content">
+  <p style="font-weight:bold;color:#b54708;" th:text="#{sync.failing.owner.title(${channelName})}">Calendar not syncing</p>
+  <p th:text="#{sync.failing.owner.intro(${channelName}, ${failures})}">The last syncs failed.</p>
+  <table th:replace="~{email/details :: stay}"></table>
+  <p th:text="#{sync.failing.owner.risk(${channelName})}">Reservations made there are not blocked here.</p>
+  <p th:text="#{sync.failing.owner.action}">Check the calendar URL.</p>
+</div>
+</html>

@@ -1,0 +1,8 @@
+<!--/* Reusable "label: value" table for stay details. */-->
+<table xmlns:th="http://www.thymeleaf.org" th:fragment="stay" role="presentation" cellpadding="0" cellspacing="0"
+       style="width:100%;margin:16px 0;border-collapse:collapse;font-size:15px;">
+  <tr th:each="row : ${rows}">
+    <td style="padding:6px 0;color:#8a817a;width:40%;" th:text="#{${row.key}}">Label</td>
+    <td style="padding:6px 0;font-weight:bold;" th:text="${row.value}">Value</td>
+  </tr>
+</table>

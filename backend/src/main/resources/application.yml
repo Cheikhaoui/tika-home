@@ -27,6 +27,9 @@ spring:
       mail.smtp.writetimeout: 10000
   thymeleaf:
     check-template-location: false # templates are only used for emails, not web pages
+  messages:
+    basename: i18n/emails
+    fallback-to-system-locale: false # unknown language -> English file, never the server's own locale
 
 springdoc:
   swagger-ui:

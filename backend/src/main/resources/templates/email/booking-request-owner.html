@@ -1,0 +1,11 @@
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{email/layout :: email(~{::content})}">
+<div th:fragment="content">
+  <p th:text="#{booking.request.owner.intro}">You have a new booking request.</p>
+  <table th:replace="~{email/details :: stay}"></table>
+  <p th:if="${message}" style="padding:12px 16px;background:#f6f1ea;border-radius:6px;">
+    <strong th:text="#{label.message}">Message</strong><br>
+    <span th:text="${message}">Guest message</span>
+  </p>
+  <p th:text="#{booking.request.owner.action}">Accept or decline within 24 hours.</p>
+</div>
+</html>
