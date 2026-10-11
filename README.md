@@ -12,7 +12,7 @@ See [CLAUDE.md](CLAUDE.md) for conventions and the roadmap.
 ## Prerequisites
 
 - **JDK 25** (e.g. `brew install --cask temurin@25`). Maven is not needed: use `./mvnw`.
-- **Node.js 20.9+** (24 LTS recommended)
+- **Node.js 22+** (24 LTS recommended; it ships npm 11, which avoids an npm 10 bug when installing Vitest)
 - **Docker Desktop** (local database and Testcontainers)
 
 ## Run locally
@@ -65,6 +65,31 @@ curl -X POST localhost:8081/api/bookings -H 'Content-Type: application/json' -d 
 | 422    | Business rule broken, e.g. `BELOW_MIN_NIGHTS`, `TOO_MANY_GUESTS`            |
 
 Errors use [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) problem details.
+
+## Website (`web/`)
+
+One page per language (`/fr`, `/en`, `/ar`, Arabic is right-to-left): hero, the house, photo gallery,
+amenities, availability calendar with live price and booking request, location, house rules, FAQ,
+floating WhatsApp button. The browser calls `/api/...` on the website, which Next.js forwards to the
+backend (`API_URL`, default `http://localhost:8081`), so there is no CORS to configure.
+
+### Replacing the placeholder content
+
+| What | Where |
+|---|---|
+| Photos (currently Unsplash) | `web/src/content/photos.ts` (put real files in `web/public/photos/`) |
+| Rooms, capacity, check-in times, amenities list | `web/src/content/property.ts` |
+| All texts (FR / EN / AR) | `web/src/app/[lang]/dictionaries/*.json` |
+| WhatsApp number, contact email, map location, site URL | `web/src/config/site.ts` (`NEXT_PUBLIC_SITE_URL` in production) |
+| Prices, max guests, minimum nights | backend database (`property` and `price_rule` tables) |
+
+### Environment variables (web)
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `API_URL` | `http://localhost:8081` | Backend address (server side only) |
+| `NEXT_PUBLIC_SITE_URL` | `http://localhost:3000` | Public URL for SEO (canonical, sitemap, Open Graph) |
+| `NEXT_PUBLIC_PROPERTY_ID` | seed property id | Which house the site shows |
 
 ## Calendar sync with Airbnb / Booking.com (iCal)
 
@@ -134,10 +159,18 @@ Docker must be running. Key tests:
 - `IcalExportIT`: the exported calendar parses back correctly and contains no personal data.
 - `EmailOutboxIT` / `BookingEmailIT`: emails over a real SMTP test server (GreenMail), retries, dedupe.
 
+Website:
+
 ```bash
 cd web
+npm test            # Vitest + React Testing Library (components, booking rules, i18n)
 npm run lint && npm run build
+npm run e2e         # Playwright in Chromium, desktop + mobile (needs Docker; starts backend and site if not running)
 ```
+
+First time only, install Playwright's browser: `npx playwright install chromium`.
+The e2e tests use the real backend for availability and prices but intercept the final booking request,
+so they don't create bookings in your local database.
 
 ## How double bookings are prevented
 

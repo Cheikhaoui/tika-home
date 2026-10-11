@@ -71,6 +71,12 @@ Recommended resolution shown to the owner (phase 5 admin):
   (see `web/AGENTS.md`). Server Components by default; add `"use client"` only for interactivity.
   Translations live in `web/src/app/[lang]/dictionaries/*.json` (en.json defines the shape).
   Use logical Tailwind utilities (`ms-*`, `ps-*`, `start-*`) instead of left/right so RTL works.
+  Tailwind v4: gradients are `bg-linear-to-*` (not `bg-gradient-to-*`). next/image: `preload`, not `priority`.
+- Web data flow: pages are static Server Components (prerendered, no API calls at build time); all API
+  calls happen in the browser from Client Components through `src/lib/api.ts` and the `/api` rewrite.
+  Calendar dates are ISO strings (`src/lib/dates.ts`), never converted through UTC. Booking calendar
+  rules live in `src/lib/stay-selection.ts` (unit tested). Placeholder content: `src/content/*`, `src/config/site.ts`.
+- Web tests: Vitest + Testing Library (`*.test.tsx` next to the code), Playwright e2e in `web/e2e`.
 - Small commits, Conventional Commit messages (`feat(backend): …`, `test: …`, `docs: …`).
 - Don't build features from a later phase without asking.
 
@@ -78,8 +84,8 @@ Recommended resolution shown to the owner (phase 5 admin):
 1. ✅ Project setup + backend core — entities, migrations, availability + quote + booking request API
 2. ✅ Channel sync — iCal import (scheduled job, Airbnb / Booking.com / others) and iCal export endpoint
 3. ✅ Email notifications (guest + owner, incl. double-booking and sync-failure alerts)
-4. Public website — gallery, availability calendar, price calculator, booking form, WhatsApp button, FR/EN/AR, SEO  ← next
-5. Admin dashboard — login (JWT), accept/decline bookings (+ confirmed/declined emails to guest), block dates, manage prices
+4. ✅ Public website — gallery, availability calendar, price calculator, booking form, WhatsApp button, FR/EN/AR, SEO
+5. Admin dashboard — login (JWT), accept/decline bookings (+ confirmed/declined emails to guest), block dates, manage prices  ← next
 6. Deployment — Docker, GitHub Actions CI, cloud hosting (+ ShedLock for scheduled jobs, real SMTP provider)
 7. AI guest assistant — Spring AI + RAG (pgvector) answering guest questions in their language
 8. Later — online payments
@@ -90,4 +96,5 @@ docker compose up -d                 # PostgreSQL on localhost:5433, Mailpit inb
 cd backend && ./mvnw verify          # build + all tests (needs Docker for Testcontainers)
 cd backend && ./mvnw spring-boot:run # API on :8081, Swagger UI at /swagger-ui.html
 cd web && npm run dev                # site on :3000
+cd web && npm test                   # unit/component tests;  npm run e2e for Playwright
 ```
