@@ -5,6 +5,7 @@ import { GallerySection } from "@/components/sections/GallerySection";
 import { LocationSection } from "@/components/sections/LocationSection";
 import { RulesSection } from "@/components/sections/RulesSection";
 import { FaqSection } from "@/components/sections/FaqSection";
+import { BookingSection } from "@/components/booking/BookingSection";
 import { getDictionary, getLocale } from "./dictionaries";
 
 // A Server Component: runs at build time (static page per language), so it can be async and
@@ -17,6 +18,7 @@ export default async function HomePage() {
       <HouseSection dict={dict} locale={locale} />
       <GallerySection dict={dict} locale={locale} />
       <AmenitiesSection dict={dict} />
+      <BookingSection dict={dict} locale={locale} />
       <LocationSection dict={dict} />
       <RulesSection dict={dict} />
       <FaqSection dict={dict} />

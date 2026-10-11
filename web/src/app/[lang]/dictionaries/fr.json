@@ -180,5 +180,76 @@
         "a": "Annulation gratuite jusqu’à 14 jours avant l’arrivée (à confirmer par le propriétaire)."
       }
     ]
+  },
+  "booking": {
+    "title": "Disponibilités et réservation",
+    "intro": "Choisissez vos dates pour voir le prix exact. Envoyer une demande est gratuit : vous ne payez rien maintenant.",
+    "loading": "Chargement des disponibilités…",
+    "loadError": "Impossible de charger les disponibilités. Réessayez, ou contactez-nous sur WhatsApp.",
+    "retry": "Réessayer",
+    "fromPrice": "À partir de {price} la nuit",
+    "minStay": {
+      "one": "Séjour minimum : {count} nuit",
+      "other": "Séjour minimum : {count} nuits"
+    },
+    "hintCheckIn": "Choisissez votre date d’arrivée",
+    "hintCheckOut": "Choisissez maintenant votre date de départ",
+    "clearDates": "Effacer les dates",
+    "legendAvailable": "Disponible",
+    "legendBooked": "Réservé",
+    "checkIn": "Arrivée",
+    "checkOut": "Départ",
+    "notSelected": "Ajouter une date",
+    "guests": "Voyageurs",
+    "decreaseGuests": "Moins de voyageurs",
+    "increaseGuests": "Plus de voyageurs",
+    "nights": {
+      "one": "{count} nuit",
+      "other": "{count} nuits"
+    },
+    "priceLine": "{price} × {nights}",
+    "cleaningFee": "Frais de ménage",
+    "total": "Total",
+    "calculating": "Calcul du prix…",
+    "quoteError": "Impossible de calculer le prix. Veuillez réessayer.",
+    "noPaymentNow": "Aucun paiement maintenant : le propriétaire confirme sous 24 heures.",
+    "continue": "Continuer",
+    "issues": {
+      "DATES_UNAVAILABLE": "Certaines de ces nuits sont déjà réservées.",
+      "CHECK_IN_IN_PAST": "La date d’arrivée est dans le passé.",
+      "BELOW_MIN_NIGHTS": "Le séjour minimum pour ces dates est de {minNights}.",
+      "ABOVE_MAX_NIGHTS": "Les séjours sont limités à 90 nuits.",
+      "TOO_MANY_GUESTS": "La maison accueille jusqu’à {maxGuests} voyageurs."
+    },
+    "form": {
+      "title": "Vos coordonnées",
+      "back": "Modifier les dates",
+      "fullName": "Nom complet",
+      "email": "E-mail",
+      "phone": "Téléphone (facultatif)",
+      "phoneHint": "Avec l’indicatif du pays, pour que le propriétaire puisse vous joindre sur WhatsApp.",
+      "message": "Message au propriétaire (facultatif)",
+      "messagePlaceholder": "Heure d’arrivée, questions, demandes particulières…",
+      "submit": "Envoyer la demande",
+      "submitting": "Envoi…",
+      "privacy": "Vos coordonnées servent uniquement à traiter votre réservation."
+    },
+    "validation": {
+      "required": "Veuillez remplir ce champ.",
+      "email": "Veuillez saisir une adresse e-mail valide.",
+      "phone": "Veuillez saisir un numéro de téléphone valide.",
+      "tooLong": "Ce texte est trop long."
+    },
+    "errors": {
+      "conflict": "Désolé, ces dates viennent d’être réservées par quelqu’un d’autre. Veuillez choisir d’autres dates.",
+      "network": "Votre demande n’a pas pu être envoyée. Vérifiez votre connexion et réessayez.",
+      "generic": "Une erreur est survenue. Réessayez, ou contactez-nous sur WhatsApp."
+    },
+    "success": {
+      "title": "Demande envoyée !",
+      "text": "Merci {name} ! Votre demande {reference} a été transmise au propriétaire, qui vous répondra sous 24 heures.",
+      "email": "Un e-mail de confirmation vous a été envoyé à {email}.",
+      "another": "Faire une autre demande"
+    }
   }
 }

@@ -24,3 +24,18 @@ vi.mock("next/image", () => ({
     return <img src={src} alt={alt} />;
   },
 }));
+
+// jsdom has no matchMedia: behave like a phone screen (no media query matches).
+if (typeof window !== "undefined" && !window.matchMedia) {
+  window.matchMedia = (query: string) =>
+    ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      addListener: () => {},
+      removeListener: () => {},
+      dispatchEvent: () => false,
+    }) as MediaQueryList;
+}

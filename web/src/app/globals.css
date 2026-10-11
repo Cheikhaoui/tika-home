@@ -42,3 +42,24 @@ body {
     scroll-behavior: auto;
   }
 }
+
+/*
+ * Booking calendar (DayPicker) themed with our colors. "body .rdp-root" is more specific than the
+ * library's own ".rdp-root", so our values win even though its stylesheet loads after this one.
+ */
+body .rdp-root {
+  --rdp-accent-color: var(--color-terracotta);
+  --rdp-accent-background-color: #f3e0d5;
+  --rdp-today-color: var(--color-zellige);
+  --rdp-day-height: 40px;
+  --rdp-day-width: 40px;
+  --rdp-day_button-height: 38px;
+  --rdp-day_button-width: 38px;
+  --rdp-months-gap: 1.5rem;
+  --rdp-disabled-opacity: 0.35;
+}
+
+body .rdp-booked .rdp-day_button {
+  background: var(--color-line);
+  text-decoration: line-through;
+}

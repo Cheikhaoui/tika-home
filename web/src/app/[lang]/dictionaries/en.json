@@ -180,5 +180,76 @@
         "a": "Free cancellation up to 14 days before arrival (placeholder: to be confirmed by the owner)."
       }
     ]
+  },
+  "booking": {
+    "title": "Availability and booking",
+    "intro": "Choose your dates to see the exact price. Sending a request is free: you don’t pay anything now.",
+    "loading": "Loading availability…",
+    "loadError": "We couldn’t load the availability. Please try again, or contact us on WhatsApp.",
+    "retry": "Try again",
+    "fromPrice": "From {price} per night",
+    "minStay": {
+      "one": "Minimum stay: {count} night",
+      "other": "Minimum stay: {count} nights"
+    },
+    "hintCheckIn": "Select your arrival date",
+    "hintCheckOut": "Now select your departure date",
+    "clearDates": "Clear dates",
+    "legendAvailable": "Available",
+    "legendBooked": "Booked",
+    "checkIn": "Arrival",
+    "checkOut": "Departure",
+    "notSelected": "Add a date",
+    "guests": "Guests",
+    "decreaseGuests": "Fewer guests",
+    "increaseGuests": "More guests",
+    "nights": {
+      "one": "{count} night",
+      "other": "{count} nights"
+    },
+    "priceLine": "{price} × {nights}",
+    "cleaningFee": "Cleaning fee",
+    "total": "Total",
+    "calculating": "Calculating the price…",
+    "quoteError": "We couldn’t calculate the price. Please try again.",
+    "noPaymentNow": "No payment now: the owner confirms within 24 hours.",
+    "continue": "Continue",
+    "issues": {
+      "DATES_UNAVAILABLE": "Some of these nights are already booked.",
+      "CHECK_IN_IN_PAST": "The arrival date is in the past.",
+      "BELOW_MIN_NIGHTS": "The minimum stay for these dates is {minNights}.",
+      "ABOVE_MAX_NIGHTS": "Stays are limited to 90 nights.",
+      "TOO_MANY_GUESTS": "The house welcomes up to {maxGuests} guests."
+    },
+    "form": {
+      "title": "Your details",
+      "back": "Change dates",
+      "fullName": "Full name",
+      "email": "Email",
+      "phone": "Phone (optional)",
+      "phoneHint": "With the country code, so the owner can reach you on WhatsApp.",
+      "message": "Message to the owner (optional)",
+      "messagePlaceholder": "Arrival time, questions, special requests…",
+      "submit": "Send booking request",
+      "submitting": "Sending…",
+      "privacy": "Your details are only used to handle your booking."
+    },
+    "validation": {
+      "required": "Please fill in this field.",
+      "email": "Please enter a valid email address.",
+      "phone": "Please enter a valid phone number.",
+      "tooLong": "This is too long."
+    },
+    "errors": {
+      "conflict": "Sorry, these dates were just booked by someone else. Please choose other dates.",
+      "network": "Your request could not be sent. Please check your connection and try again.",
+      "generic": "Something went wrong. Please try again, or contact us on WhatsApp."
+    },
+    "success": {
+      "title": "Request sent!",
+      "text": "Thank you {name}! Your request {reference} has been sent to the owner, who will reply within 24 hours.",
+      "email": "A confirmation email is on its way to {email}.",
+      "another": "Make another request"
+    }
   }
 }
