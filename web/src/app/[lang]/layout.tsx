@@ -4,6 +4,9 @@ import { direction, locales } from "@/i18n/config";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
+import { siteUrl } from "@/config/site";
+import { heroPhoto } from "@/content/photos";
+import { languageAlternates, ogLocale } from "@/lib/seo";
 import { getDictionary, getLocale } from "./dictionaries";
 import "../globals.css";
 
@@ -24,8 +27,25 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const dict = await getDictionary();
-  return { title: dict.meta.title, description: dict.meta.description };
+  const [locale, dict] = await Promise.all([getLocale(), getDictionary()]);
+  const ogImage = `${heroPhoto.src}?w=1200&h=630&fit=crop&q=80&auto=format`;
+  return {
+    metadataBase: new URL(siteUrl),
+    title: dict.meta.title,
+    description: dict.meta.description,
+    alternates: { canonical: `/${locale}`, languages: languageAlternates() },
+    openGraph: {
+      type: "website",
+      url: `/${locale}`,
+      siteName: dict.site.name,
+      title: dict.meta.title,
+      description: dict.meta.description,
+      locale: ogLocale[locale],
+      alternateLocale: locales.filter((l) => l !== locale).map((l) => ogLocale[l]),
+      images: [{ url: ogImage, width: 1200, height: 630, alt: dict.hero.photoAlt }],
+    },
+    twitter: { card: "summary_large_image", title: dict.meta.title, description: dict.meta.description, images: [ogImage] },
+  };
 }
 
 // This is the ROOT layout (there is no app/layout.tsx): it lives under [lang] so that
