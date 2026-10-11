@@ -1,13 +1,23 @@
-import { Container } from "@/components/ui/Container";
-import { getDictionary } from "./dictionaries";
+import { Hero } from "@/components/sections/Hero";
+import { HouseSection } from "@/components/sections/HouseSection";
+import { AmenitiesSection } from "@/components/sections/AmenitiesSection";
+import { LocationSection } from "@/components/sections/LocationSection";
+import { RulesSection } from "@/components/sections/RulesSection";
+import { FaqSection } from "@/components/sections/FaqSection";
+import { getDictionary, getLocale } from "./dictionaries";
 
-// Temporary home page: the real sections arrive in the next commits.
+// A Server Component: runs at build time (static page per language), so it can be async and
+// read the dictionary directly. The interactive parts are small Client Components inside it.
 export default async function HomePage() {
-  const dict = await getDictionary();
+  const [dict, locale] = await Promise.all([getDictionary(), getLocale()]);
   return (
-    <Container className="py-24 text-center">
-      <h1 className="font-serif text-5xl font-semibold">{dict.site.name}</h1>
-      <p className="mt-4 text-lg text-muted">{dict.site.tagline}</p>
-    </Container>
+    <>
+      <Hero dict={dict} />
+      <HouseSection dict={dict} locale={locale} />
+      <AmenitiesSection dict={dict} />
+      <LocationSection dict={dict} />
+      <RulesSection dict={dict} />
+      <FaqSection dict={dict} />
+    </>
   );
 }
