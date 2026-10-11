@@ -55,7 +55,7 @@ class EmailOutboxIT {
         assertThat(received).hasSize(1);
         assertThat(received[0].getSubject()).isEqualTo("تم استلام طلبك");
         assertThat(received[0].getAllRecipients()[0].toString()).isEqualTo("guest@example.com");
-        assertThat(received[0].getReplyTo()[0].toString()).isEqualTo("cheikhaoui.hicham@gmail.com");
+        assertThat(received[0].getReplyTo()[0].toString()).isEqualTo("owner@example.com");
         // getContent() decodes the transfer encoding (quoted-printable) back to the original UTF-8 text.
         assertThat((String) received[0].getContent()).contains("dir=\"rtl\"", "شكرا");
         assertThat(outbox.findAll()).singleElement().satisfies(e -> {
@@ -109,13 +109,13 @@ class EmailOutboxIT {
 
     @Test
     void enqueueOutsideATransactionIsAProgrammingError() {
-        assertThatThrownBy(() -> emailOutbox.enqueue(EmailType.BOOKING_REQUEST_OWNER, "a@example.com", "en",
+        assertThatThrownBy(() -> emailOutbox.enqueue(EmailType.BOOKING_REQUEST_OWNER, "a@example.com", null, "en",
                 new RenderedEmail("s", "b"), null))
                 .isInstanceOf(IllegalTransactionStateException.class);
     }
 
     private boolean queue(String to, String subject, String html, String dedupeKey) {
-        return tx.execute(s -> emailOutbox.enqueue(EmailType.BOOKING_REQUEST_GUEST, to, "ar",
+        return tx.execute(s -> emailOutbox.enqueue(EmailType.BOOKING_REQUEST_GUEST, to, "owner@example.com", "ar",
                 new RenderedEmail(subject, html), dedupeKey));
     }
 

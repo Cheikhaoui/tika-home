@@ -50,7 +50,9 @@ public class NotificationService {
                 "booking.request.guest.subject", new Object[]{booking.getReference()},
                 stayRows(booking, guestLocale),
                 Map.of("guestName", guest.getFullName(), "propertyName", booking.getProperty().getName()));
-        outbox.enqueue(EmailType.BOOKING_REQUEST_GUEST, guest.getEmail(), guestLocale.getLanguage(), toGuest, null);
+        // Guest hits "Reply" -> reaches the owner.
+        outbox.enqueue(EmailType.BOOKING_REQUEST_GUEST, guest.getEmail(), properties.ownerEmail(),
+                guestLocale.getLanguage(), toGuest, null);
 
         Locale ownerLocale = ownerLocale();
         List<Map.Entry<String, String>> ownerRows = new ArrayList<>();
@@ -68,8 +70,9 @@ public class NotificationService {
                 new Object[]{booking.getReference(), booking.getCheckIn().format(SHORT_DATE),
                         booking.getCheckOut().format(SHORT_DATE)},
                 ownerRows, ownerVars);
-        outbox.enqueue(EmailType.BOOKING_REQUEST_OWNER, properties.ownerEmail(), ownerLocale.getLanguage(), toOwner,
-                null);
+        // Owner hits "Reply" -> answers the guest directly.
+        outbox.enqueue(EmailType.BOOKING_REQUEST_OWNER, properties.ownerEmail(), guest.getEmail(),
+                ownerLocale.getLanguage(), toOwner, null);
     }
 
     /**
@@ -95,7 +98,7 @@ public class NotificationService {
                 new Object[]{channel.getName(), booking.getReference()}, rows,
                 Map.of("channelName", channel.getName(), "recommendationKey", recommendation));
         String dedupeKey = "double-booking:" + booking.getId() + ":" + channel.getId() + ":" + reservation.uid();
-        outbox.enqueue(EmailType.DOUBLE_BOOKING_OWNER, properties.ownerEmail(), locale.getLanguage(), email,
+        outbox.enqueue(EmailType.DOUBLE_BOOKING_OWNER, properties.ownerEmail(), null, locale.getLanguage(), email,
                 dedupeKey.length() <= 200 ? dedupeKey : dedupeKey.substring(0, 200));
     }
 
@@ -112,14 +115,15 @@ public class NotificationService {
         RenderedEmail email = renderer.render("sync-failing-owner", locale, "sync.failing.owner.subject",
                 new Object[]{channel.getName()}, rows,
                 Map.of("channelName", channel.getName(), "failures", channel.getConsecutiveFailures()));
-        outbox.enqueue(EmailType.SYNC_FAILING_OWNER, properties.ownerEmail(), locale.getLanguage(), email, null);
+        outbox.enqueue(EmailType.SYNC_FAILING_OWNER, properties.ownerEmail(), null, locale.getLanguage(), email, null);
     }
 
     public void syncRecovered(Channel channel) {
         Locale locale = ownerLocale();
         RenderedEmail email = renderer.render("sync-recovered-owner", locale, "sync.recovered.owner.subject",
                 new Object[]{channel.getName()}, List.of(), Map.of("channelName", channel.getName()));
-        outbox.enqueue(EmailType.SYNC_RECOVERED_OWNER, properties.ownerEmail(), locale.getLanguage(), email, null);
+        outbox.enqueue(EmailType.SYNC_RECOVERED_OWNER, properties.ownerEmail(), null, locale.getLanguage(), email,
+                null);
     }
 
     private Locale ownerLocale() {

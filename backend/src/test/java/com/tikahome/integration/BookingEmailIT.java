@@ -60,11 +60,13 @@ class BookingEmailIT {
         MimeMessage toGuest = receivedBy("sara@example.com");
         assertThat(toGuest.getSubject()).isEqualTo("Nous avons bien reçu votre demande de réservation " + booking.getReference());
         assertThat((String) toGuest.getContent()).contains("Bonjour Sara Benali,", "Tika Home Marrakech", "340,00");
+        assertThat(toGuest.getReplyTo()[0].toString()).isEqualTo("cheikhaoui.hicham@gmail.com"); // reply -> owner
 
         MimeMessage toOwner = receivedBy("cheikhaoui.hicham@gmail.com");
         assertThat(toOwner.getSubject()).startsWith("New booking request " + booking.getReference());
         assertThat((String) toOwner.getContent())
                 .contains("Sara Benali", "sara@example.com", "+212600000000", "FR", "Arrivée tardive", "€340.00");
+        assertThat(toOwner.getReplyTo()[0].toString()).isEqualTo("sara@example.com"); // reply -> guest
     }
 
     @Test

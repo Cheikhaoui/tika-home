@@ -13,7 +13,7 @@ class OutboxEmailTest {
 
     @Test
     void retryDelaysGrowThenGiveUp() {
-        var email = new OutboxEmail(EmailType.BOOKING_REQUEST_OWNER, "o@example.com", "en", "s", "b", null, t0);
+        var email = new OutboxEmail(EmailType.BOOKING_REQUEST_OWNER, "o@example.com", null, "en", "s", "b", null, t0);
 
         email.markAttemptFailed(t0, "down", 5);
         assertThat(email.getNextAttemptAt()).isEqualTo(t0.plus(Duration.ofMinutes(1)));

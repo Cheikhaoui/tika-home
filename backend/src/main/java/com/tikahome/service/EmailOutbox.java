@@ -22,15 +22,17 @@ public class EmailOutbox {
     }
 
     /**
+     * @param replyTo   optional Reply-To address
      * @param dedupeKey optional; if an email with the same key was ever queued, nothing happens
      * @return true if queued
      */
     @Transactional(propagation = Propagation.MANDATORY) // fails fast if someone calls it outside a transaction
-    public boolean enqueue(EmailType type, String recipient, String language, RenderedEmail email, String dedupeKey) {
+    public boolean enqueue(EmailType type, String recipient, String replyTo, String language, RenderedEmail email,
+                           String dedupeKey) {
         if (dedupeKey != null && outbox.existsByDedupeKey(dedupeKey)) {
             return false;
         }
-        outbox.save(new OutboxEmail(type, recipient, language, email.subject(), email.html(), dedupeKey,
+        outbox.save(new OutboxEmail(type, recipient, replyTo, language, email.subject(), email.html(), dedupeKey,
                 clock.instant()));
         return true;
     }

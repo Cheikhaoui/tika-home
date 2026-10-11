@@ -61,8 +61,8 @@ public class EmailSender {
         MimeMessageHelper helper = new MimeMessageHelper(mime, "UTF-8");
         helper.setFrom(properties.fromAddress());
         helper.setTo(email.getRecipient());
-        if (properties.ownerEmail() != null) {
-            helper.setReplyTo(properties.ownerEmail()); // a guest hitting "Reply" reaches the owner
+        if (email.getReplyTo() != null) {
+            helper.setReplyTo(email.getReplyTo());
         }
         helper.setSubject(email.getSubject());
         helper.setText(email.getHtmlBody(), true);

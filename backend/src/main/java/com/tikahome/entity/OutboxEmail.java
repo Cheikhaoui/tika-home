@@ -38,6 +38,10 @@ public class OutboxEmail {
     @Column(nullable = false, length = 300)
     private String subject;
 
+    /** Where "Reply" goes; null = no Reply-To header. */
+    @Column(name = "reply_to", length = 320)
+    private String replyTo;
+
     @Column(name = "html_body", nullable = false, columnDefinition = "text")
     private String htmlBody;
 
@@ -67,11 +71,12 @@ public class OutboxEmail {
         // for JPA
     }
 
-    public OutboxEmail(EmailType type, String recipient, String language, String subject, String htmlBody,
-                       String dedupeKey, Instant now) {
+    public OutboxEmail(EmailType type, String recipient, String replyTo, String language, String subject,
+                       String htmlBody, String dedupeKey, Instant now) {
         this.id = UUID.randomUUID();
         this.type = type;
         this.recipient = recipient;
+        this.replyTo = replyTo;
         this.language = language;
         this.subject = subject;
         this.htmlBody = htmlBody;
@@ -102,6 +107,7 @@ public class OutboxEmail {
     public UUID getId() { return id; }
     public EmailType getType() { return type; }
     public String getRecipient() { return recipient; }
+    public String getReplyTo() { return replyTo; }
     public String getLanguage() { return language; }
     public String getSubject() { return subject; }
     public String getHtmlBody() { return htmlBody; }
