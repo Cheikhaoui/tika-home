@@ -1,6 +1,7 @@
 import { Hero } from "@/components/sections/Hero";
 import { HouseSection } from "@/components/sections/HouseSection";
 import { AmenitiesSection } from "@/components/sections/AmenitiesSection";
+import { GallerySection } from "@/components/sections/GallerySection";
 import { LocationSection } from "@/components/sections/LocationSection";
 import { RulesSection } from "@/components/sections/RulesSection";
 import { FaqSection } from "@/components/sections/FaqSection";
@@ -14,6 +15,7 @@ export default async function HomePage() {
     <>
       <Hero dict={dict} />
       <HouseSection dict={dict} locale={locale} />
+      <GallerySection dict={dict} locale={locale} />
       <AmenitiesSection dict={dict} />
       <LocationSection dict={dict} />
       <RulesSection dict={dict} />

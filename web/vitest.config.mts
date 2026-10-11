@@ -6,7 +6,7 @@ export default defineConfig({
   resolve: { tsconfigPaths: true }, // "@/..." imports, same as in tsconfig.json
   test: {
     environment: "jsdom",
-    setupFiles: ["./vitest.setup.ts"],
+    setupFiles: ["./vitest.setup.tsx"],
     include: ["src/**/*.test.{ts,tsx}"], // e2e/ is for Playwright
   },
 });
