@@ -251,5 +251,10 @@
       "email": "A confirmation email is on its way to {email}.",
       "another": "Make another request"
     }
+  },
+  "whatsapp": {
+    "label": "Chat with us on WhatsApp",
+    "short": "WhatsApp",
+    "message": "Hello! I’m interested in staying at Tika Home in Marrakech."
   }
 }

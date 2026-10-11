@@ -251,5 +251,10 @@
       "email": "Un e-mail de confirmation vous a été envoyé à {email}.",
       "another": "Faire une autre demande"
     }
+  },
+  "whatsapp": {
+    "label": "Discutez avec nous sur WhatsApp",
+    "short": "WhatsApp",
+    "message": "Bonjour ! Je suis intéressé(e) par un séjour à Tika Home à Marrakech."
   }
 }

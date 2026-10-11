@@ -3,6 +3,7 @@ import { Amiri, Cormorant_Garamond, Geist, Noto_Sans_Arabic } from "next/font/go
 import { direction, locales } from "@/i18n/config";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
 import { getDictionary, getLocale } from "./dictionaries";
 import "../globals.css";
 
@@ -46,6 +47,7 @@ export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
           {children}
         </main>
         <Footer dict={dict} locale={locale} />
+        <WhatsAppButton dict={dict} />
       </body>
     </html>
   );
