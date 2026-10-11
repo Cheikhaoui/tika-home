@@ -1,12 +1,27 @@
 {
   "meta": {
-    "title": "Tika Home — House in Marrakech",
-    "description": "Book our house in Marrakech directly."
+    "title": "Tika Home — Riad with plunge pool in the heart of Marrakech",
+    "description": "Book our 3-bedroom riad in the Marrakech medina directly: plunge pool, roof terrace, 10 minutes from Jemaa el-Fna. Best price, no booking fees."
   },
-  "home": {
-    "title": "Tika Home",
-    "subtitle": "Your home in Marrakech",
-    "comingSoon": "The website is coming soon."
+  "site": {
+    "name": "Tika Home",
+    "tagline": "A private riad in the heart of the Marrakech medina."
   },
-  "language": "Language"
+  "nav": {
+    "label": "Main navigation",
+    "house": "The house",
+    "gallery": "Photos",
+    "amenities": "Amenities",
+    "location": "Location",
+    "faq": "FAQ",
+    "book": "Book",
+    "language": "Language",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "skipToContent": "Skip to content"
+  },
+  "footer": {
+    "contact": "Contact",
+    "rights": "Direct booking with the owner."
+  }
 }

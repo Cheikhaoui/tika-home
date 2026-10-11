@@ -1,12 +1,27 @@
 {
   "meta": {
-    "title": "Tika Home — Maison à Marrakech",
-    "description": "Réservez directement notre maison à Marrakech."
+    "title": "Tika Home — Riad avec piscine au cœur de Marrakech",
+    "description": "Réservez directement notre riad de 3 chambres dans la médina de Marrakech : piscine, terrasse sur le toit, à 10 minutes de Jemaa el-Fna. Meilleur prix, sans frais de réservation."
   },
-  "home": {
-    "title": "Tika Home",
-    "subtitle": "Votre maison à Marrakech",
-    "comingSoon": "Le site arrive bientôt."
+  "site": {
+    "name": "Tika Home",
+    "tagline": "Un riad privé au cœur de la médina de Marrakech."
   },
-  "language": "Langue"
+  "nav": {
+    "label": "Navigation principale",
+    "house": "La maison",
+    "gallery": "Photos",
+    "amenities": "Équipements",
+    "location": "Emplacement",
+    "faq": "FAQ",
+    "book": "Réserver",
+    "language": "Langue",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu",
+    "skipToContent": "Aller au contenu"
+  },
+  "footer": {
+    "contact": "Contact",
+    "rights": "Réservation directe avec le propriétaire."
+  }
 }
