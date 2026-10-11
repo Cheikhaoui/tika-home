@@ -54,6 +54,16 @@ public class Channel {
     @Column(name = "last_conflict_count", nullable = false)
     private int lastConflictCount;
 
+    @Column(name = "consecutive_failures", nullable = false)
+    private int consecutiveFailures;
+
+    /** True while the owner has been told this channel is failing and it hasn't recovered yet. */
+    @Column(name = "failure_alert_sent", nullable = false)
+    private boolean failureAlertSent;
+
+    @Column(name = "last_success_at")
+    private Instant lastSuccessAt;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -71,11 +81,17 @@ public class Channel {
         this.createdAt = Instant.now();
     }
 
-    public void recordSuccess(Instant at, int conflictCount) {
+    /** @return true if this success ends an outage the owner was alerted about (send "recovered"). */
+    public boolean recordSuccess(Instant at, int conflictCount) {
+        boolean recovered = failureAlertSent;
         lastSyncedAt = at;
+        lastSuccessAt = at;
         lastSyncStatus = SyncStatus.SUCCESS;
         lastError = null;
         lastConflictCount = conflictCount;
+        consecutiveFailures = 0;
+        failureAlertSent = false;
+        return recovered;
     }
 
     /** Keeps the previous blocks and conflict count: a failed download tells us nothing new. */
@@ -83,6 +99,16 @@ public class Channel {
         lastSyncedAt = at;
         lastSyncStatus = SyncStatus.FAILED;
         lastError = error == null || error.length() <= MAX_ERROR_LENGTH ? error : error.substring(0, MAX_ERROR_LENGTH);
+        consecutiveFailures++;
+    }
+
+    /** True exactly once per outage: when failures reach the threshold and no alert was sent yet. */
+    public boolean shouldAlertFailure(int threshold) {
+        if (consecutiveFailures >= threshold && !failureAlertSent) {
+            failureAlertSent = true;
+            return true;
+        }
+        return false;
     }
 
     public void disable() {
@@ -99,4 +125,7 @@ public class Channel {
     public SyncStatus getLastSyncStatus() { return lastSyncStatus; }
     public String getLastError() { return lastError; }
     public int getLastConflictCount() { return lastConflictCount; }
+    public int getConsecutiveFailures() { return consecutiveFailures; }
+    public boolean isFailureAlertSent() { return failureAlertSent; }
+    public Instant getLastSuccessAt() { return lastSuccessAt; }
 }

@@ -7,6 +7,7 @@ import com.tikahome.entity.BlockSource;
 import com.tikahome.entity.BlockedDate;
 import com.tikahome.entity.Channel;
 import com.tikahome.entity.ChannelType;
+import com.tikahome.entity.EmailType;
 import com.tikahome.entity.Property;
 import com.tikahome.entity.SyncStatus;
 import com.tikahome.exception.BookingRejectedException;
@@ -25,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -47,6 +49,7 @@ class ChannelSyncIT {
     @Autowired PropertyRepository properties;
     @Autowired ChannelRepository channels;
     @Autowired BlockedDateRepository blockedDates;
+    @Autowired JdbcTemplate jdbc;
 
     FakeFeedServer airbnb;
     Property property;
@@ -55,6 +58,7 @@ class ChannelSyncIT {
 
     @BeforeEach
     void setUp() throws Exception {
+        jdbc.update("delete from email_outbox");
         airbnb = new FakeFeedServer();
         property = properties.save(new Property("sync-" + UUID.randomUUID(), "Sync house", 6,
                 new BigDecimal("100.00"), BigDecimal.ZERO, "EUR", 1));
@@ -183,6 +187,52 @@ class ChannelSyncIT {
         assertThat(result.created()).isEqualTo(1);
         assertThat(result.conflictingBookingIds()).containsExactly(direct);
         assertThat(channels.findById(channel.getId()).orElseThrow().getLastConflictCount()).isEqualTo(1);
+    }
+
+    @Test
+    void doubleBookingAlertIsSentOnlyOnceAcrossSyncs() {
+        var direct = bookingService.request(booking(day(10), day(14)));
+        airbnb.serve(calendar(event("late@airbnb.com", day(12), day(16), "Reserved")));
+
+        syncService.sync(channel.getId());
+        syncService.sync(channel.getId()); // same conflict seen again 15 minutes later
+
+        assertThat(queued(EmailType.DOUBLE_BOOKING_OWNER)).isEqualTo(1);
+        assertThat(jdbc.queryForObject("select subject from email_outbox where type = 'DOUBLE_BOOKING_OWNER'",
+                String.class)).isEqualTo("Double booking: Airbnb reservation overlaps booking " + direct.getReference());
+    }
+
+    @Test
+    void ownerIsAlertedOnceAfterThreeFailuresAndOnceOnRecovery() {
+        airbnb.respond(500, "oops");
+        syncService.sync(channel.getId());
+        syncService.sync(channel.getId());
+        assertThat(queued(EmailType.SYNC_FAILING_OWNER)).isZero(); // 2 failures: could be a blip
+
+        syncService.sync(channel.getId());
+        syncService.sync(channel.getId());
+        assertThat(queued(EmailType.SYNC_FAILING_OWNER)).isEqualTo(1); // 3rd failure alerts, 4th doesn't
+
+        airbnb.serve(calendar());
+        syncService.sync(channel.getId());
+        syncService.sync(channel.getId());
+        assertThat(queued(EmailType.SYNC_RECOVERED_OWNER)).isEqualTo(1);
+        assertThat(channels.findById(channel.getId()).orElseThrow().getConsecutiveFailures()).isZero();
+    }
+
+    @Test
+    void shortBlipDoesNotAlert() {
+        airbnb.respond(503, "busy");
+        syncService.sync(channel.getId());
+        syncService.sync(channel.getId());
+        airbnb.serve(calendar());
+        syncService.sync(channel.getId());
+
+        assertThat(queued(EmailType.SYNC_FAILING_OWNER) + queued(EmailType.SYNC_RECOVERED_OWNER)).isZero();
+    }
+
+    private long queued(EmailType type) {
+        return jdbc.queryForObject("select count(*) from email_outbox where type = ?", Long.class, type.name());
     }
 
     private CreateBookingRequest booking(LocalDate checkIn, LocalDate checkOut) {

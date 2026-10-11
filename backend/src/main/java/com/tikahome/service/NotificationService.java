@@ -2,13 +2,17 @@ package com.tikahome.service;
 
 import com.tikahome.config.NotificationProperties;
 import com.tikahome.entity.Booking;
+import com.tikahome.entity.BookingStatus;
+import com.tikahome.entity.Channel;
 import com.tikahome.entity.EmailType;
 import com.tikahome.entity.Guest;
+import com.tikahome.model.ExternalEvent;
 import com.tikahome.service.EmailOutbox.RenderedEmail;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,6 +29,7 @@ import java.util.Map;
 public class NotificationService {
 
     private static final DateTimeFormatter SHORT_DATE = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ENGLISH);
+    private static final DateTimeFormatter DATE_TIME = DateTimeFormatter.ofPattern("d MMM yyyy HH:mm", Locale.ENGLISH);
 
     private final EmailOutbox outbox;
     private final EmailRenderer renderer;
@@ -65,6 +70,56 @@ public class NotificationService {
                 ownerRows, ownerVars);
         outbox.enqueue(EmailType.BOOKING_REQUEST_OWNER, properties.ownerEmail(), ownerLocale.getLanguage(), toOwner,
                 null);
+    }
+
+    /**
+     * A platform reservation overlaps a direct booking. Sent once per (booking, reservation) pair:
+     * the sync sees the same conflict every 15 minutes, the dedupe key stops repeats.
+     */
+    public void doubleBooking(Booking booking, Channel channel, ExternalEvent reservation) {
+        Locale locale = ownerLocale();
+        Guest guest = booking.getGuest();
+        List<Map.Entry<String, String>> rows = List.of(
+                Map.entry("label.channel", channel.getName()),
+                Map.entry("label.reference", booking.getReference()),
+                Map.entry("label.status", booking.getStatus().name()),
+                Map.entry("label.guest", guest.getFullName()),
+                Map.entry("label.email", guest.getEmail()),
+                Map.entry("label.directStay", EmailRenderer.formatDate(booking.getCheckIn(), locale) + " → "
+                        + EmailRenderer.formatDate(booking.getCheckOut(), locale)),
+                Map.entry("label.platformStay", EmailRenderer.formatDate(reservation.range().start(), locale) + " → "
+                        + EmailRenderer.formatDate(reservation.range().end(), locale)));
+        String recommendation = booking.getStatus() == BookingStatus.CONFIRMED
+                ? "double.booking.owner.confirmed" : "double.booking.owner.requested";
+        RenderedEmail email = renderer.render("double-booking-owner", locale, "double.booking.owner.subject",
+                new Object[]{channel.getName(), booking.getReference()}, rows,
+                Map.of("channelName", channel.getName(), "recommendationKey", recommendation));
+        String dedupeKey = "double-booking:" + booking.getId() + ":" + channel.getId() + ":" + reservation.uid();
+        outbox.enqueue(EmailType.DOUBLE_BOOKING_OWNER, properties.ownerEmail(), locale.getLanguage(), email,
+                dedupeKey.length() <= 200 ? dedupeKey : dedupeKey.substring(0, 200));
+    }
+
+    /** A channel failed several times in a row: new platform reservations are not blocked here. */
+    public void syncFailing(Channel channel) {
+        Locale locale = ownerLocale();
+        ZoneId zone = channel.getProperty().getZoneId();
+        String lastSuccess = channel.getLastSuccessAt() == null ? "never"
+                : DATE_TIME.format(channel.getLastSuccessAt().atZone(zone));
+        List<Map.Entry<String, String>> rows = List.of(
+                Map.entry("label.channel", channel.getName()),
+                Map.entry("label.lastSuccess", lastSuccess),
+                Map.entry("label.lastError", String.valueOf(channel.getLastError())));
+        RenderedEmail email = renderer.render("sync-failing-owner", locale, "sync.failing.owner.subject",
+                new Object[]{channel.getName()}, rows,
+                Map.of("channelName", channel.getName(), "failures", channel.getConsecutiveFailures()));
+        outbox.enqueue(EmailType.SYNC_FAILING_OWNER, properties.ownerEmail(), locale.getLanguage(), email, null);
+    }
+
+    public void syncRecovered(Channel channel) {
+        Locale locale = ownerLocale();
+        RenderedEmail email = renderer.render("sync-recovered-owner", locale, "sync.recovered.owner.subject",
+                new Object[]{channel.getName()}, List.of(), Map.of("channelName", channel.getName()));
+        outbox.enqueue(EmailType.SYNC_RECOVERED_OWNER, properties.ownerEmail(), locale.getLanguage(), email, null);
     }
 
     private Locale ownerLocale() {

@@ -1,6 +1,8 @@
 package com.tikahome.service;
 
+import com.tikahome.config.NotificationProperties;
 import com.tikahome.entity.BlockedDate;
+import com.tikahome.entity.Booking;
 import com.tikahome.entity.BookingStatus;
 import com.tikahome.entity.Channel;
 import com.tikahome.entity.Property;
@@ -54,10 +56,13 @@ public class ChannelSyncService {
     private final IcalFeedClient feedClient;
     private final TransactionTemplate tx;
     private final Clock clock;
+    private final NotificationService notifications;
+    private final NotificationProperties notificationProperties;
 
     public ChannelSyncService(ChannelRepository channels, PropertyRepository properties,
                               BlockedDateRepository blockedDates, BookingRepository bookings,
-                              IcalFeedClient feedClient, TransactionTemplate tx, Clock clock) {
+                              IcalFeedClient feedClient, TransactionTemplate tx, Clock clock,
+                              NotificationService notifications, NotificationProperties notificationProperties) {
         this.channels = channels;
         this.properties = properties;
         this.blockedDates = blockedDates;
@@ -65,6 +70,8 @@ public class ChannelSyncService {
         this.feedClient = feedClient;
         this.tx = tx;
         this.clock = clock;
+        this.notifications = notifications;
+        this.notificationProperties = notificationProperties;
     }
 
     public SyncResult sync(UUID channelId) {
@@ -79,8 +86,12 @@ public class ChannelSyncService {
             events = IcalParser.parse(feedClient.fetch(target.url()), target.zone());
         } catch (FeedFetchException | IcalParseException e) {
             log.warn("Channel '{}' ({}) sync failed, keeping existing blocks: {}", target.name(), channelId, e.getMessage());
-            tx.executeWithoutResult(status -> channels.findById(channelId)
-                    .ifPresent(c -> c.recordFailure(clock.instant(), e.getMessage())));
+            tx.executeWithoutResult(status -> channels.findById(channelId).ifPresent(c -> {
+                c.recordFailure(clock.instant(), e.getMessage());
+                if (c.shouldAlertFailure(notificationProperties.syncFailureAlertThreshold())) {
+                    notifications.syncFailing(c);
+                }
+            }));
             return SyncResult.failed(e.getMessage());
         }
 
@@ -127,8 +138,11 @@ public class ChannelSyncService {
 
         Set<UUID> conflicts = new LinkedHashSet<>();
         for (ExternalEvent event : wanted.values()) {
-            bookings.findOverlapping(property.getId(), event.range().start(), event.range().end(), BookingStatus.ACTIVE)
-                    .forEach(b -> conflicts.add(b.getId()));
+            for (Booking booking : bookings.findOverlapping(property.getId(), event.range().start(),
+                    event.range().end(), BookingStatus.ACTIVE)) {
+                conflicts.add(booking.getId());
+                notifications.doubleBooking(booking, channel, event); // deduplicated: one email per conflict
+            }
         }
         if (!conflicts.isEmpty()) {
             // A reservation was taken on the platform while a direct booking holds the same dates.
@@ -137,7 +151,9 @@ public class ChannelSyncService {
                     channel.getName(), channelId, conflicts);
         }
 
-        channel.recordSuccess(clock.instant(), conflicts.size());
+        if (channel.recordSuccess(clock.instant(), conflicts.size())) {
+            notifications.syncRecovered(channel);
+        }
         return SyncResult.success(created, updated, deleted, List.copyOf(conflicts));
     }
 
