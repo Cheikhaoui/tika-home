@@ -17,5 +17,14 @@ services:
       timeout: 5s
       retries: 10
 
+  # Fake mail server for local dev: catches every email the API sends.
+  # Inbox UI: http://localhost:8025  (SMTP on localhost:1025). Nothing reaches real inboxes.
+  mailpit:
+    image: axllent/mailpit:v1.31.5
+    container_name: tikahome-mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
 volumes:
   postgres-data:

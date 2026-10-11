@@ -16,6 +16,17 @@ spring:
       hibernate.jdbc.time_zone: UTC
   flyway:
     locations: classpath:db/migration
+  mail:
+    # Local dev: Mailpit from docker-compose (inbox at http://localhost:8025).
+    # Production SMTP provider (Brevo, SES, ...) is configured in phase 6 via environment variables.
+    host: localhost
+    port: 1025
+    properties:
+      mail.smtp.connectiontimeout: 5000
+      mail.smtp.timeout: 10000
+      mail.smtp.writetimeout: 10000
+  thymeleaf:
+    check-template-location: false # templates are only used for emails, not web pages
 
 springdoc:
   swagger-ui:
@@ -30,3 +41,8 @@ tikahome:
     read-timeout: PT30S
     max-feed-size: 2MB
     allow-http: false
+  notifications:
+    owner-email: cheikhaoui.hicham@gmail.com
+    owner-language: en
+    from-address: "Tika Home <no-reply@tikahome.local>"
+    site-url: http://localhost:3000
