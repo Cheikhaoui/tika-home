@@ -77,6 +77,16 @@ Recommended resolution shown to the owner (phase 5 admin):
   Calendar dates are ISO strings (`src/lib/dates.ts`), never converted through UTC. Booking calendar
   rules live in `src/lib/stay-selection.ts` (unit tested). Placeholder content: `src/content/*`, `src/config/site.ts`.
 - Web tests: Vitest + Testing Library (`*.test.tsx` next to the code), Playwright e2e in `web/e2e`.
+- Admin security: `/api/admin/**` has its own Spring Security chain (JWT from the HttpOnly `tikahome_admin`
+  cookie, ROLE_ADMIN, `OriginCheckFilter` on writes). Never return secrets (iCal import URLs are masked,
+  export token only in the admin). Admin endpoints for the house live under `/api/admin/properties/{id}/...`.
+- MapStruct (`mapper/AdminMapper`) for entity -> admin DTO mappings; unmapped targets fail the build. Any helper
+  method with a common signature (e.g. String -> String) MUST be `@Named` and used via `qualifiedByName`,
+  otherwise MapStruct applies it to every matching field.
+- Web admin (`src/app/admin`, `src/components/admin`): second root layout, English, TanStack Query (query keys
+  `dashboard`, `bookings`, `booking`, `calendar`, `pricing`, `channels`; invalidate after mutations).
+  Cache Components rules: read `params` inside `<Suspense>`, `usePathname` in layouts inside `<Suspense>`,
+  and components reading `new Date()` during render inside `<Suspense>`.
 - Small commits, Conventional Commit messages (`feat(backend): …`, `test: …`, `docs: …`).
 - Don't build features from a later phase without asking.
 
@@ -85,8 +95,10 @@ Recommended resolution shown to the owner (phase 5 admin):
 2. ✅ Channel sync — iCal import (scheduled job, Airbnb / Booking.com / others) and iCal export endpoint
 3. ✅ Email notifications (guest + owner, incl. double-booking and sync-failure alerts)
 4. ✅ Public website — gallery, availability calendar, price calculator, booking form, WhatsApp button, FR/EN/AR, SEO
-5. Admin dashboard — login (JWT), accept/decline bookings (+ confirmed/declined emails to guest), block dates, manage prices  ← next
-6. Deployment — Docker, GitHub Actions CI, cloud hosting (+ ShedLock for scheduled jobs, real SMTP provider)
+5. ✅ Admin dashboard — login (JWT cookie), confirm/decline bookings with guest emails, calendar + blocks, pricing, channels
+5b. Later — cancel a confirmed booking (with guest email), admin audit log
+6. Deployment — Docker, GitHub Actions CI, cloud hosting (+ ShedLock for scheduled jobs, real SMTP provider,
+   admin secrets as env variables, Secure cookie)  ← next
 7. AI guest assistant — Spring AI + RAG (pgvector) answering guest questions in their language
 8. Later — online payments
 

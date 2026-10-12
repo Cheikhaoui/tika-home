@@ -91,35 +91,51 @@ backend (`API_URL`, default `http://localhost:8081`), so there is no CORS to con
 | `NEXT_PUBLIC_SITE_URL` | `http://localhost:3000` | Public URL for SEO (canonical, sitemap, Open Graph) |
 | `NEXT_PUBLIC_PROPERTY_ID` | seed property id | Which house the site shows |
 
+## Admin dashboard (`/admin`)
+
+http://localhost:3000/admin — for the owner, English, works on a phone.
+
+| Page | What the owner does |
+|---|---|
+| Dashboard | requests to answer, who is staying, next arrivals, double bookings, calendars not syncing |
+| Bookings | tabs Requests / Upcoming / Past / Declined; detail with guest contact (email, phone, WhatsApp) |
+| ↳ Confirm | re-syncs Airbnb / Booking.com first, refuses if their dates are now taken, emails the guest |
+| ↳ Decline | optional personal message, releases the dates, emails the guest |
+| Calendar | month view of bookings, platform reservations and own blocks; block / unblock dates |
+| Pricing | base price, cleaning fee, min nights, max guests; seasonal prices |
+| Channels | export link to paste into Airbnb / Booking.com, connect their calendars, sync now, pause, remove |
+
+**First login.** The first admin account is created at startup from configuration if none exists.
+Locally: the `tikahome.admin.bootstrap-*` values in `backend/src/main/resources/application.yml`.
+In production set environment variables instead (never commit real passwords):
+
+```bash
+TIKAHOME_ADMIN_BOOTSTRAP_EMAIL=owner@example.com
+TIKAHOME_ADMIN_BOOTSTRAP_PASSWORD=<at least 12 characters>
+TIKAHOME_ADMIN_JWT_SECRET=<random, at least 32 characters>
+TIKAHOME_ADMIN_COOKIE_SECURE=true
+TIKAHOME_ADMIN_ALLOWED_ORIGINS=https://<your-domain>
+```
+
+**Security model.** BCrypt password hashes; login returns a JWT (HS256, 8 h) in an **HttpOnly,
+SameSite=Strict** cookie (Secure over HTTPS) that JavaScript can't read; every `/api/admin/**` call is
+checked by Spring Security (OAuth2 resource server); write requests from other origins are rejected;
+5 wrong passwords lock the account for 15 minutes. The Next.js `proxy.ts` only redirects to the login
+page for convenience: the backend is the real gate.
+
 ## Calendar sync with Airbnb / Booking.com (iCal)
 
 **Import:** every 15 minutes (`tikahome.ical.sync-interval`) the API downloads each enabled channel's
 iCal feed and stores its reservations as blocked dates (`source = ICAL`). Cancelled reservations
 disappear at the next sync. A failed download keeps the existing blocks.
 
-Until the admin dashboard exists (phase 5), add a channel with SQL. Get the URL from
-Airbnb (*Calendar → Availability → Connect calendars → Export*) or Booking.com
-(*Rates & Availability → Sync calendars → Export*):
-
-```bash
-docker exec -it tikahome-postgres psql -U tikahome -d tikahome -c "
-  insert into channel (id, property_id, type, name, import_url)
-  values (gen_random_uuid(), '6f1c2b8e-4d3a-4f5e-9a7b-1c2d3e4f5a6b', 'AIRBNB', 'Airbnb',
-          'https://www.airbnb.com/calendar/ical/....ics?s=...');"
-```
-
-`type` is one of `AIRBNB`, `BOOKING_COM`, `VRBO`, `OTHER`. Check the result in the `channel` table
-(`last_sync_status`, `last_error`, `last_conflict_count`).
+Connect a platform in **Admin → Channels**: paste the calendar export link from Airbnb
+(*Calendar → Availability → Connect calendars → Export*) or Booking.com
+(*Rates & Availability → Sync calendars → Export*). The page shows the sync status and errors.
 
 **Export:** our calendar (active bookings + manual blocks, no personal data) is published at
-`/ical/{token}.ics`. Get the URL with:
-
-```bash
-docker exec tikahome-postgres psql -U tikahome -d tikahome -tA -c \
-  "select 'http://localhost:8081/ical/' || ical_export_token || '.ics' from property"
-```
-
-Paste it into Airbnb / Booking.com (*Import calendar*). The platforms must reach it over the internet,
+`https://<site>/ical/{token}.ics`; copy it from **Admin → Channels** and paste it into Airbnb /
+Booking.com (*Import calendar*). The platforms must reach it over the internet,
 so this only works once the API is deployed (phase 6); `localhost` is only for testing.
 
 **Double bookings across platforms:** iCal is refreshed every few hours by the platforms, so a guest
@@ -158,6 +174,7 @@ Docker must be running. Key tests:
 - `ChannelSyncIT`: iCal import against a fake Airbnb server (create / update / delete, outages, conflicts).
 - `IcalExportIT`: the exported calendar parses back correctly and contains no personal data.
 - `EmailOutboxIT` / `BookingEmailIT`: emails over a real SMTP test server (GreenMail), retries, dedupe.
+- `AdminAuthIT`: cookie flags, lockout, Origin check; `Admin*IT`: every admin endpoint over real HTTP.
 
 Website:
 
@@ -169,8 +186,8 @@ npm run e2e         # Playwright in Chromium, desktop + mobile (needs Docker; st
 ```
 
 First time only, install Playwright's browser: `npx playwright install chromium`.
-The e2e tests use the real backend for availability and prices but intercept the final booking request,
-so they don't create bookings in your local database.
+The public-site e2e tests use the real backend but intercept the final booking request. The admin e2e
+test logs in with the local dev admin, creates a request two years ahead and declines it.
 
 ## How double bookings are prevented
 
