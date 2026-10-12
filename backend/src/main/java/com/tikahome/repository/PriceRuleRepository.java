@@ -17,4 +17,6 @@ public interface PriceRuleRepository extends JpaRepository<PriceRule, UUID> {
               and r.endDate > :from
             """)
     List<PriceRule> findOverlapping(UUID propertyId, LocalDate from, LocalDate to);
+
+    List<PriceRule> findByPropertyIdOrderByStartDate(UUID propertyId);
 }

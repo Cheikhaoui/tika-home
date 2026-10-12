@@ -77,6 +77,14 @@ public class Property {
         return HexFormat.of().formatHex(bytes);
     }
 
+    /** Owner changes the pricing basics. Existing bookings keep the total they were created with. */
+    public void updateSettings(BigDecimal baseNightlyPrice, BigDecimal cleaningFee, int minNights, int maxGuests) {
+        this.baseNightlyPrice = baseNightlyPrice;
+        this.cleaningFee = cleaningFee;
+        this.minNights = minNights;
+        this.maxGuests = maxGuests;
+    }
+
     public UUID getId() { return id; }
     public String getSlug() { return slug; }
     public String getName() { return name; }

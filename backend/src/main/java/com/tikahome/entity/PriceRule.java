@@ -59,11 +59,22 @@ public class PriceRule {
         this.priority = priority;
     }
 
+    public void update(String name, LocalDate startDate, LocalDate endDate, BigDecimal nightlyPrice,
+                       Integer minNights, int priority) {
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.nightlyPrice = nightlyPrice;
+        this.minNights = minNights;
+        this.priority = priority;
+    }
+
     public boolean covers(LocalDate night) {
         return !night.isBefore(startDate) && night.isBefore(endDate);
     }
 
     public UUID getId() { return id; }
+    public Property getProperty() { return property; }
     public String getName() { return name; }
     public LocalDate getStartDate() { return startDate; }
     public LocalDate getEndDate() { return endDate; }

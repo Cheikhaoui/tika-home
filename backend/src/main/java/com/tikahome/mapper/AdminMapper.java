@@ -3,9 +3,13 @@ package com.tikahome.mapper;
 import com.tikahome.dto.admin.AdminBookingDetail;
 import com.tikahome.dto.admin.AdminBookingSummary;
 import com.tikahome.dto.admin.BlockSummary;
+import com.tikahome.dto.admin.PriceRuleDto;
+import com.tikahome.dto.admin.PropertySettings;
 import com.tikahome.entity.BlockedDate;
 import com.tikahome.entity.Booking;
 import com.tikahome.entity.Guest;
+import com.tikahome.entity.PriceRule;
+import com.tikahome.entity.Property;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -33,4 +37,10 @@ public interface AdminMapper {
     BlockSummary toBlockSummary(BlockedDate block);
 
     List<BlockSummary> toBlockSummaries(List<BlockedDate> blocks);
+
+    PropertySettings toSettings(Property property);
+
+    PriceRuleDto toRuleDto(PriceRule rule);
+
+    List<PriceRuleDto> toRuleDtos(List<PriceRule> rules);
 }
