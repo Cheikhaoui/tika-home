@@ -11,11 +11,26 @@ import org.springframework.data.jpa.repository.Query;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface BookingRepository extends JpaRepository<Booking, UUID> {
 
     // Admin lists. @EntityGraph loads the guest in the same query (avoids one extra query per row: "N+1").
+    // Dashboard (one property).
+    long countByPropertyIdAndStatus(UUID propertyId, BookingStatus status);
+
+    @EntityGraph(attributePaths = "guest")
+    List<Booking> findTop5ByPropertyIdAndStatusOrderByCreatedAtAsc(UUID propertyId, BookingStatus status);
+
+    @EntityGraph(attributePaths = "guest")
+    List<Booking> findTop5ByPropertyIdAndStatusAndCheckInGreaterThanEqualOrderByCheckInAsc(
+            UUID propertyId, BookingStatus status, LocalDate from);
+
+    @EntityGraph(attributePaths = "guest")
+    Optional<Booking> findFirstByPropertyIdAndStatusAndCheckInLessThanEqualAndCheckOutAfter(
+            UUID propertyId, BookingStatus status, LocalDate checkInOnOrBefore, LocalDate checkOutAfter);
+
     @EntityGraph(attributePaths = "guest")
     Page<Booking> findByStatusIn(Collection<BookingStatus> statuses, Pageable pageable);
 
