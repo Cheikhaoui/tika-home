@@ -1,6 +1,6 @@
 package com.tikahome.controller;
 
-import com.tikahome.config.SecurityConfig;
+import com.tikahome.WebMvcSecurityTestConfig;
 import com.tikahome.exception.BookingRejectedException;
 import com.tikahome.model.QuoteIssue;
 import com.tikahome.service.BookingService;
@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /** Web layer only: JSON binding, validation and error mapping. The service is mocked. */
 @WebMvcTest(BookingController.class)
-@Import(SecurityConfig.class)
+@Import(WebMvcSecurityTestConfig.class)
 class BookingControllerTest {
 
     @Autowired

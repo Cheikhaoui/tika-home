@@ -49,3 +49,11 @@ tikahome:
     owner-language: en
     from-address: "Tika Home <no-reply@tikahome.local>"
     site-url: http://localhost:3000
+  admin:
+    # Local development only. In production these come from environment variables
+    # (TIKAHOME_ADMIN_JWT_SECRET, TIKAHOME_ADMIN_BOOTSTRAP_EMAIL, TIKAHOME_ADMIN_BOOTSTRAP_PASSWORD).
+    jwt-secret: local-dev-only-secret-change-me-in-production-0123456789
+    bootstrap-email: cheikhaoui.hicham@gmail.com
+    bootstrap-password: local-dev-password
+    cookie-secure: false # http://localhost; true (HTTPS only) in production
+    allowed-origins: http://localhost:3000

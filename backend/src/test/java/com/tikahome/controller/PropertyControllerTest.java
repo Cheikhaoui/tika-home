@@ -1,6 +1,6 @@
 package com.tikahome.controller;
 
-import com.tikahome.config.SecurityConfig;
+import com.tikahome.WebMvcSecurityTestConfig;
 import com.tikahome.entity.Property;
 import com.tikahome.exception.NotFoundException;
 import com.tikahome.service.PropertyService;
@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(PropertyController.class)
-@Import(SecurityConfig.class)
+@Import(WebMvcSecurityTestConfig.class)
 class PropertyControllerTest {
 
     @Autowired MockMvc mvc;

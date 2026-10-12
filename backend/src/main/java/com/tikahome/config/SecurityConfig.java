@@ -1,23 +1,48 @@
 package com.tikahome.config;
 
+import com.tikahome.security.CookieBearerTokenResolver;
+import com.tikahome.security.OriginCheckFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
- * Only the public booking API, the iCal export and API docs are reachable; everything else is denied.
- * Admin JWT authentication arrives in phase 5.
+ * Two filter chains, checked in @Order:
+ * 1. /api/admin/** : JWT from the HttpOnly cookie, ROLE_ADMIN required (except login), Origin check.
+ * 2. everything else: public booking API, iCal export and API docs; anything unknown is denied.
  */
 @Configuration
 public class SecurityConfig {
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    @Order(1)
+    SecurityFilterChain adminChain(HttpSecurity http, AdminProperties admin) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // stateless JSON API, no cookies/sessions
+                .securityMatcher("/api/admin/**")
+                .csrf(csrf -> csrf.disable()) // replaced by SameSite=Strict cookie + OriginCheckFilter
+                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.POST, "/api/admin/auth/login", "/api/admin/auth/logout").permitAll()
+                        .anyRequest().hasRole("ADMIN"))
+                .oauth2ResourceServer(oauth -> oauth
+                        .bearerTokenResolver(new CookieBearerTokenResolver(admin.cookieName()))
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(rolesFromClaim())))
+                .addFilterBefore(new OriginCheckFilter(admin.allowedOrigins()), BearerTokenAuthenticationFilter.class);
+        return http.build();
+    }
+
+    @Bean
+    @Order(2)
+    SecurityFilterChain publicChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable()) // stateless JSON API, no cookies on public endpoints
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/properties/**").permitAll()
@@ -27,5 +52,15 @@ public class SecurityConfig {
                         .requestMatchers("/error").permitAll()
                         .anyRequest().denyAll());
         return http.build();
+    }
+
+    /** Our tokens carry "roles": ["ADMIN"]; Spring Security expects authorities like ROLE_ADMIN. */
+    private static JwtAuthenticationConverter rolesFromClaim() {
+        JwtGrantedAuthoritiesConverter authorities = new JwtGrantedAuthoritiesConverter();
+        authorities.setAuthoritiesClaimName("roles");
+        authorities.setAuthorityPrefix("ROLE_");
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+        converter.setJwtGrantedAuthoritiesConverter(authorities);
+        return converter;
     }
 }
