@@ -1,5 +1,6 @@
 package com.tikahome.entity;
 
+import com.tikahome.exception.InvalidBookingStateException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,6 +16,7 @@ import jakarta.persistence.Version;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -88,15 +90,25 @@ public class Booking {
         return b;
     }
 
+    /** The owner accepts the request. */
+    public void confirm() {
+        transitionFrom(BookingStatus.REQUESTED, BookingStatus.CONFIRMED);
+    }
+
+    /** The owner refuses the request: its dates are released (DECLINED is outside the exclusion constraint). */
     public void decline() {
         transitionFrom(BookingStatus.REQUESTED, BookingStatus.DECLINED);
     }
 
     private void transitionFrom(BookingStatus expected, BookingStatus next) {
         if (status != expected) {
-            throw new IllegalStateException("Booking " + id + " is " + status + ", expected " + expected);
+            throw new InvalidBookingStateException(getReference(), status, expected);
         }
         status = next;
+    }
+
+    public long getNights() {
+        return ChronoUnit.DAYS.between(checkIn, checkOut);
     }
 
     @PreUpdate
@@ -123,4 +135,5 @@ public class Booking {
     public String getCurrency() { return currency; }
     public String getMessage() { return message; }
     public Instant getCreatedAt() { return createdAt; }
+    public Instant getUpdatedAt() { return updatedAt; }
 }

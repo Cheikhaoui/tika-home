@@ -75,6 +75,31 @@ public class NotificationService {
                 ownerLocale.getLanguage(), toOwner, null);
     }
 
+    /** The owner confirmed the request: tell the guest, in their language. */
+    public void bookingConfirmed(Booking booking) {
+        Guest guest = booking.getGuest();
+        Locale locale = EmailRenderer.locale(guest.getPreferredLanguage());
+        RenderedEmail email = renderer.render("booking-confirmed-guest", locale, "booking.confirmed.guest.subject",
+                new Object[]{booking.getReference()}, stayRows(booking, locale),
+                Map.of("guestName", guest.getFullName()));
+        outbox.enqueue(EmailType.BOOKING_CONFIRMED_GUEST, guest.getEmail(), properties.ownerEmail(),
+                locale.getLanguage(), email, null);
+    }
+
+    /** The owner declined the request; {@code ownerMessage} (optional) is included as written. */
+    public void bookingDeclined(Booking booking, String ownerMessage) {
+        Guest guest = booking.getGuest();
+        Locale locale = EmailRenderer.locale(guest.getPreferredLanguage());
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("guestName", guest.getFullName());
+        vars.put("ownerMessage", ownerMessage == null || ownerMessage.isBlank() ? null : ownerMessage.strip());
+        vars.put("siteUrl", properties.siteUrl() + "/" + locale.getLanguage() + "#booking");
+        RenderedEmail email = renderer.render("booking-declined-guest", locale, "booking.declined.guest.subject",
+                new Object[]{booking.getReference()}, stayRows(booking, locale), vars);
+        outbox.enqueue(EmailType.BOOKING_DECLINED_GUEST, guest.getEmail(), properties.ownerEmail(),
+                locale.getLanguage(), email, null);
+    }
+
     /**
      * A platform reservation overlaps a direct booking. Sent once per (booking, reservation) pair:
      * the sync sees the same conflict every 15 minutes, the dedupe key stops repeats.

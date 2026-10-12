@@ -101,4 +101,5 @@ public class BlockedDate {
     public String getReason() { return reason; }
     public BlockSource getSource() { return source; }
     public String getExternalUid() { return externalUid; }
+    public Channel getChannel() { return channel; }
 }

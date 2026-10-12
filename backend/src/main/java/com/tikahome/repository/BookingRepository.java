@@ -2,6 +2,9 @@ package com.tikahome.repository;
 
 import com.tikahome.entity.Booking;
 import com.tikahome.entity.BookingStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -11,6 +14,16 @@ import java.util.List;
 import java.util.UUID;
 
 public interface BookingRepository extends JpaRepository<Booking, UUID> {
+
+    // Admin lists. @EntityGraph loads the guest in the same query (avoids one extra query per row: "N+1").
+    @EntityGraph(attributePaths = "guest")
+    Page<Booking> findByStatusIn(Collection<BookingStatus> statuses, Pageable pageable);
+
+    @EntityGraph(attributePaths = "guest")
+    Page<Booking> findByStatusAndCheckOutAfter(BookingStatus status, LocalDate date, Pageable pageable);
+
+    @EntityGraph(attributePaths = "guest")
+    Page<Booking> findByStatusAndCheckOutLessThanEqual(BookingStatus status, LocalDate date, Pageable pageable);
 
     /** Half-open ranges [a1,a2) and [b1,b2) overlap iff a1 < b2 and b1 < a2. */
     @Query("""

@@ -1,0 +1,10 @@
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{email/layout :: email(~{::content})}">
+<div th:fragment="content">
+  <p th:text="#{booking.confirmed.guest.greeting(${guestName})}">Hello,</p>
+  <p style="font-weight:bold;color:#067647;" th:text="#{booking.confirmed.guest.title}">Your stay is confirmed!</p>
+  <table th:replace="~{email/details :: stay}"></table>
+  <p th:text="#{booking.confirmed.guest.next}">The owner will contact you about payment and arrival.</p>
+  <p th:text="#{booking.request.guest.reply}">Questions? Reply to this email.</p>
+  <p th:text="#{booking.request.guest.signature}">See you soon!</p>
+</div>
+</html>
