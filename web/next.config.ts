@@ -14,7 +14,11 @@ const nextConfig: NextConfig = {
   // The browser calls /api/... on this site; Next.js forwards it to the backend.
   // Same origin for the browser = no CORS setup, and the backend address stays private.
   async rewrites() {
-    return [{ source: "/api/:path*", destination: `${apiUrl}/api/:path*` }];
+    return [
+      { source: "/api/:path*", destination: `${apiUrl}/api/:path*` },
+      // Our calendar for Airbnb / Booking.com, served on the website domain: https://<site>/ical/<token>.ics
+      { source: "/ical/:path*", destination: `${apiUrl}/ical/:path*` },
+    ];
   },
   turbopack: {
     root: path.join(__dirname), // this app is the root, not a parent folder with its own lockfile

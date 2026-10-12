@@ -16,14 +16,16 @@
   --color-danger: #b42318;
   --color-success: #067647;
 
-  --font-sans: var(--font-latin-sans), var(--font-arabic-sans), system-ui, sans-serif;
-  --font-serif: var(--font-latin-serif), var(--font-arabic-serif), Georgia, serif;
+  /* Each var() has a fallback: the admin layout loads no Arabic fonts, and an undefined var() without
+     fallback would invalidate the whole font-family declaration. */
+  --font-sans: var(--font-latin-sans, system-ui), var(--font-arabic-sans, system-ui), system-ui, sans-serif;
+  --font-serif: var(--font-latin-serif, Georgia), var(--font-arabic-serif, Georgia), Georgia, serif;
 }
 
 /* Arabic: Arabic fonts first (Latin fonts don't contain Arabic letters, so order matters for mixed text). */
 :lang(ar) {
-  --font-sans: var(--font-arabic-sans), var(--font-latin-sans), system-ui, sans-serif;
-  --font-serif: var(--font-arabic-serif), var(--font-latin-serif), Georgia, serif;
+  --font-sans: var(--font-arabic-sans, system-ui), var(--font-latin-sans, system-ui), system-ui, sans-serif;
+  --font-serif: var(--font-arabic-serif, Georgia), var(--font-latin-serif, Georgia), Georgia, serif;
 }
 
 html {

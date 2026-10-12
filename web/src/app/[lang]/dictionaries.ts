@@ -13,10 +13,13 @@ const dictionaries = {
   ar: () => import("./dictionaries/ar.json").then((m) => m.default),
 } satisfies Record<Locale, () => Promise<Dictionary>>;
 
-/** Current locale from the [lang] root segment; 404 for unknown values like /de. */
+/**
+ * Current locale from the [lang] root segment; 404 for unknown values like /de.
+ * lang() is typed string | undefined because /admin is another root layout without a [lang] segment.
+ */
 export async function getLocale(): Promise<Locale> {
   const value = await lang();
-  if (!isLocale(value)) notFound();
+  if (!value || !isLocale(value)) notFound();
   return value;
 }
 
