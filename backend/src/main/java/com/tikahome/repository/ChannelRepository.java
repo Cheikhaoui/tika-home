@@ -11,4 +11,6 @@ public interface ChannelRepository extends JpaRepository<Channel, UUID> {
     List<Channel> findByEnabledTrue();
 
     List<Channel> findByPropertyIdAndEnabledTrue(UUID propertyId);
+
+    List<Channel> findByPropertyIdOrderByName(UUID propertyId);
 }

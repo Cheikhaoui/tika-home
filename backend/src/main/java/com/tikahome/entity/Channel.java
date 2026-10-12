@@ -115,6 +115,15 @@ public class Channel {
         enabled = false;
     }
 
+    /** {@code importUrl} null = keep the current one (the owner only sees a masked version). */
+    public void update(String name, String importUrl, boolean enabled) {
+        this.name = name;
+        if (importUrl != null && !importUrl.isBlank()) {
+            this.importUrl = importUrl.strip();
+        }
+        this.enabled = enabled;
+    }
+
     public UUID getId() { return id; }
     public Property getProperty() { return property; }
     public ChannelType getType() { return type; }
