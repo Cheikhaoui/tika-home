@@ -1,5 +1,23 @@
 server:
   port: 8081
+  shutdown: graceful # finish in-flight requests before stopping (deploys, restarts)
+
+# Only the health endpoints are exposed (liveness/readiness for the hosting platform's checks).
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+  health:
+    # A mail outage must not mark the app as down (the platform would restart it for nothing):
+    # emails wait in the outbox and are retried.
+    mail:
+      enabled: false
 
 spring:
   application:

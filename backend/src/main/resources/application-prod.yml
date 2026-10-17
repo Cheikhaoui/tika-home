@@ -1,0 +1,40 @@
+# Production profile (SPRING_PROFILES_ACTIVE=prod). Every secret comes from an environment variable
+# WITHOUT a default: if one is missing, the app refuses to start instead of silently using the local
+# development values from application.yml (which are public in the Git repository).
+server:
+  port: ${PORT:8080}
+  forward-headers-strategy: framework # behind the hosting proxy: trust X-Forwarded-Proto/Host (HTTPS)
+
+spring:
+  datasource:
+    url: ${DATABASE_URL}           # jdbc:postgresql://<host>:5432/tikahome?sslmode=require
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+  mail:
+    host: ${SMTP_HOST}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USERNAME}
+    password: ${SMTP_PASSWORD}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: ${SMTP_STARTTLS:true}
+
+logging:
+  structured:
+    format:
+      console: ecs # JSON logs, readable by Azure Log Analytics / any log platform
+
+tikahome:
+  notifications:
+    owner-email: ${OWNER_EMAIL}
+    owner-language: ${OWNER_LANGUAGE:en}
+    from-address: ${MAIL_FROM}     # e.g. "Tika Home <no-reply@yourdomain.com>"
+    site-url: ${SITE_URL}          # https://yourdomain.com (no trailing slash)
+  admin:
+    jwt-secret: ${ADMIN_JWT_SECRET}
+    bootstrap-email: ${ADMIN_BOOTSTRAP_EMAIL:}       # only needed for the very first start
+    bootstrap-password: ${ADMIN_BOOTSTRAP_PASSWORD:}
+    cookie-secure: ${ADMIN_COOKIE_SECURE:true}
+    allowed-origins: ${SITE_URL}
+  ical:
+    allow-http: false
