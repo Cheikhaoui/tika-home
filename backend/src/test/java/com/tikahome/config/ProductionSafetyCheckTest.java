@@ -22,7 +22,7 @@ class ProductionSafetyCheckTest {
     @Test
     void acceptsAProperProductionSetup() {
         assertThat(ProductionSafetyCheck.problems(
-                admin("kM2v9QxR7tLp4WzB8nYc3HsF6jDg1AeU5oIrTqVb", "a-long-real-password!", true),
+                admin("test-fixture-not-a-real-secret-0123456789", "test-fixture-password-123", true),
                 notifications("https://tikahome.example"))).isEmpty();
     }
 
