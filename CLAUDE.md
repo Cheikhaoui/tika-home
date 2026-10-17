@@ -17,7 +17,9 @@ availability** and must sync with external channels (iCal) without ever allowing
 ```
 /backend            Spring Boot API
 /web                Next.js site (public pages + /admin)
-docker-compose.yml  Local PostgreSQL
+docker-compose.yml       Local dev services (PostgreSQL :5433, Mailpit :8025)
+docker-compose.full.yml  Whole stack in production containers (website :3080), used by CI e2e
+.github/                 CI workflow + Dependabot
 CLAUDE.md, README.md
 ```
 
@@ -87,6 +89,12 @@ Recommended resolution shown to the owner (phase 5 admin):
   `dashboard`, `bookings`, `booking`, `calendar`, `pricing`, `channels`; invalidate after mutations).
   Cache Components rules: read `params` inside `<Suspense>`, `usePathname` in layouts inside `<Suspense>`,
   and components reading `new Date()` during render inside `<Suspense>`.
+- The repository is PUBLIC: never commit a real secret. Production config = `application-prod.yml` with env
+  variables and no defaults; `ProductionSafetyCheck` rejects the dev values. New secrets -> env variable +
+  README table. Local placeholders must look obviously fake.
+- The website forwards `/api/*` and `/ical/*` to the backend in `src/proxy.ts` (runtime `API_URL`), not in
+  next.config rewrites (those are frozen at build time). `NEXT_PUBLIC_*` values are Docker build args.
+- Scheduled jobs: `@Scheduled` + `@SchedulerLock` (ShedLock) so they run once across instances.
 - Small commits, Conventional Commit messages (`feat(backend): …`, `test: …`, `docs: …`).
 - Don't build features from a later phase without asking.
 
@@ -97,9 +105,11 @@ Recommended resolution shown to the owner (phase 5 admin):
 4. ✅ Public website — gallery, availability calendar, price calculator, booking form, WhatsApp button, FR/EN/AR, SEO
 5. ✅ Admin dashboard — login (JWT cookie), confirm/decline bookings with guest emails, calendar + blocks, pricing, channels
 5b. Later — cancel a confirmed booking (with guest email), admin audit log
-6. Deployment — Docker, GitHub Actions CI, cloud hosting (+ ShedLock for scheduled jobs, real SMTP provider,
-   admin secrets as env variables, Secure cookie)  ← next
-7. AI guest assistant — Spring AI + RAG (pgvector) answering guest questions in their language
+6. ✅ Production readiness — prod profile, health checks, ShedLock, Docker images, full stack in containers,
+   GitHub Actions CI + Dependabot
+6b. Later — hosting (Azure App Service + PostgreSQL Flexible Server, Bicep, deploy workflow with OIDC,
+   Key Vault secrets, real SMTP provider, domain + HTTPS), then connect the export calendar to Airbnb
+7. AI guest assistant — Spring AI + RAG (pgvector) answering guest questions in their language  ← next
 8. Later — online payments
 
 ## Commands
@@ -109,4 +119,5 @@ cd backend && ./mvnw verify          # build + all tests (needs Docker for Testc
 cd backend && ./mvnw spring-boot:run # API on :8081, Swagger UI at /swagger-ui.html
 cd web && npm run dev                # site on :3000
 cd web && npm test                   # unit/component tests;  npm run e2e for Playwright
+docker compose -f docker-compose.full.yml up -d --build --wait   # production containers on :3080
 ```

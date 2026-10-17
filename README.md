@@ -1,5 +1,7 @@
 # Tika Home
 
+[![CI](https://github.com/Cheikhaoui/tika-home/actions/workflows/ci.yml/badge.svg)](https://github.com/Cheikhaoui/tika-home/actions/workflows/ci.yml)
+
 Direct booking website for a house in Marrakech.
 
 | Folder    | What                                   | Stack                                          |
@@ -71,7 +73,8 @@ Errors use [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) problem details.
 One page per language (`/fr`, `/en`, `/ar`, Arabic is right-to-left): hero, the house, photo gallery,
 amenities, availability calendar with live price and booking request, location, house rules, FAQ,
 floating WhatsApp button. The browser calls `/api/...` on the website, which Next.js forwards to the
-backend (`API_URL`, default `http://localhost:8081`), so there is no CORS to configure.
+backend (`API_URL`, default `http://localhost:8081`, read at runtime by `src/proxy.ts`), so there is
+no CORS to configure.
 
 ### Replacing the placeholder content
 
@@ -136,7 +139,7 @@ Connect a platform in **Admin → Channels**: paste the calendar export link fro
 **Export:** our calendar (active bookings + manual blocks, no personal data) is published at
 `https://<site>/ical/{token}.ics`; copy it from **Admin → Channels** and paste it into Airbnb /
 Booking.com (*Import calendar*). The platforms must reach it over the internet,
-so this only works once the API is deployed (phase 6); `localhost` is only for testing.
+so this only works once the site is hosted; `localhost` is only for testing.
 
 **Double bookings across platforms:** iCal is refreshed every few hours by the platforms, so a guest
 can occasionally book the same dates elsewhere before the calendars catch up. The sync then imports
@@ -159,6 +162,50 @@ A booking never fails because of email, and no email is lost if the mail server 
 Locally, Mailpit (from `docker compose up -d`) catches everything at http://localhost:8025.
 Settings live under `tikahome.notifications` in `application.yml` (owner address, owner language).
 Texts: `backend/src/main/resources/i18n/emails*.properties`; templates: `templates/email/`.
+
+## Production containers
+
+Both apps ship as Docker images (`backend/Dockerfile`, `web/Dockerfile`): multi-stage builds, non-root
+users, health checks. To run the **whole stack exactly as in production** (prod profile, production
+images) on your machine:
+
+```bash
+docker compose -f docker-compose.full.yml up -d --build --wait
+# website http://localhost:3080 · admin http://localhost:3080/admin · emails http://localhost:8026
+E2E_BASE_URL=http://localhost:3080 E2E_ADMIN_EMAIL=admin@tikahome.test \
+  E2E_ADMIN_PASSWORD=compose-full-admin-password npm --prefix web run e2e
+docker compose -f docker-compose.full.yml down -v
+```
+
+The values in `docker-compose.full.yml` are local placeholders. **This repository is public: real
+secrets never go into Git**; in production they come from the hosting platform's secret store.
+
+### Production configuration (`SPRING_PROFILES_ACTIVE=prod`, set by the image)
+
+The API refuses to start if a required variable is missing, or if it detects the public development
+secrets, a non-Secure cookie or a non-https site URL.
+
+| Variable | Example / note |
+|---|---|
+| `DATABASE_URL`, `DATABASE_USERNAME`, `DATABASE_PASSWORD` | `jdbc:postgresql://host:5432/tikahome?sslmode=require` |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD` | e.g. Brevo `smtp-relay.brevo.com:587` |
+| `OWNER_EMAIL`, `MAIL_FROM` | `Tika Home <no-reply@yourdomain>` |
+| `SITE_URL` | `https://yourdomain` (also the allowed origin for admin requests) |
+| `ADMIN_JWT_SECRET` | random, at least 32 characters |
+| `ADMIN_BOOTSTRAP_EMAIL`, `ADMIN_BOOTSTRAP_PASSWORD` | only for the very first start |
+
+Website image: `API_URL` (runtime, e.g. `http://api:8080`); `NEXT_PUBLIC_SITE_URL` and
+`NEXT_PUBLIC_PROPERTY_ID` are **build arguments** (frozen into the prerendered pages).
+
+Health checks: `GET /actuator/health/liveness` and `/actuator/health/readiness` (nothing else from
+Actuator is exposed; Swagger is off in production). Scheduled jobs use ShedLock, so several API
+instances can run at once.
+
+### Continuous integration
+
+`.github/workflows/ci.yml` runs on every push and pull request: backend tests (with Testcontainers),
+website lint / types / tests / build, then the Playwright suite against the production containers.
+Dependabot opens weekly grouped dependency updates.
 
 ## Tests
 
