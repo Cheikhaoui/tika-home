@@ -1,0 +1,97 @@
+# Runs on every push to main and every pull request. Public repository: GitHub Actions minutes are free.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+# A newer push to the same branch cancels the older, now pointless run.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend (unit + integration tests)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "25"
+          cache: maven
+      # verify = unit tests (Surefire) + Testcontainers integration tests (Failsafe); Docker is available.
+      - run: ./mvnw -B verify
+      - name: Test reports
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: backend-test-reports
+          path: |
+            backend/target/surefire-reports
+            backend/target/failsafe-reports
+
+  web:
+    name: Website (lint, types, tests, build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npx next typegen && npx tsc --noEmit # route types (PageProps, ...) are generated
+      - run: npm test
+      - run: npm run build
+
+  e2e:
+    name: End-to-end (production containers)
+    needs: [backend, web]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Start the stack (production images, prod profile)
+        run: docker compose -f docker-compose.full.yml up -d --build --wait
+      - name: Install Playwright
+        working-directory: web
+        run: npm ci && npx playwright install --with-deps chromium
+      - name: Playwright
+        working-directory: web
+        env:
+          E2E_BASE_URL: http://localhost:3080
+          E2E_ADMIN_EMAIL: admin@tikahome.test
+          E2E_ADMIN_PASSWORD: compose-full-admin-password
+        run: npx playwright test
+      - name: Container logs
+        if: failure()
+        run: docker compose -f docker-compose.full.yml logs --no-color > compose-logs.txt
+      - name: Upload traces and logs
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: e2e-results
+          path: |
+            web/test-results
+            compose-logs.txt
+      - name: Stop the stack
+        if: always()
+        run: docker compose -f docker-compose.full.yml down -v
