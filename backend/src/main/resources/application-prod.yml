@@ -16,8 +16,15 @@ spring:
     username: ${SMTP_USERNAME}
     password: ${SMTP_PASSWORD}
     properties:
-      mail.smtp.auth: true
+      mail.smtp.auth: ${SMTP_AUTH:true}
       mail.smtp.starttls.enable: ${SMTP_STARTTLS:true}
+
+# API documentation is for development only (http://localhost:8081/swagger-ui.html).
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
 
 logging:
   structured:

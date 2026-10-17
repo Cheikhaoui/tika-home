@@ -1,0 +1,70 @@
+# The whole application in containers, with the PRODUCTION images and the "prod" Spring profile:
+# the closest thing to the real deployment, on your own machine (and in CI).
+#
+#   docker compose -f docker-compose.full.yml up -d --build --wait
+#   website http://localhost:3080 · admin http://localhost:3080/admin · emails http://localhost:8026
+#   docker compose -f docker-compose.full.yml down -v      # stop and delete its data
+#
+# Separate project, ports and volume: it never touches the dev database from docker-compose.yml.
+# The values below are LOCAL-ONLY placeholders (this file is public): production secrets come from
+# the hosting platform's secret store, never from Git.
+name: tikahome-full
+
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_DB: tikahome
+      POSTGRES_USER: tikahome
+      POSTGRES_PASSWORD: compose-full-db-password
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tikahome -d tikahome"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  mailpit:
+    image: axllent/mailpit:v1.31.5
+    ports:
+      - "8026:8025"
+
+  api:
+    build: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: jdbc:postgresql://db:5432/tikahome
+      DATABASE_USERNAME: tikahome
+      DATABASE_PASSWORD: compose-full-db-password
+      SMTP_HOST: mailpit
+      SMTP_PORT: "1025"
+      SMTP_USERNAME: ""
+      SMTP_PASSWORD: ""
+      SMTP_AUTH: "false"
+      SMTP_STARTTLS: "false"
+      OWNER_EMAIL: owner@tikahome.test
+      MAIL_FROM: "Tika Home <no-reply@tikahome.test>"
+      SITE_URL: http://localhost:3080
+      ADMIN_JWT_SECRET: compose-full-placeholder-not-a-real-secret-0123456789
+      ADMIN_BOOTSTRAP_EMAIL: admin@tikahome.test
+      ADMIN_BOOTSTRAP_PASSWORD: compose-full-admin-password
+      ADMIN_COOKIE_SECURE: "true" # browsers accept Secure cookies on http://localhost
+
+  web:
+    build:
+      context: ./web
+      args:
+        NEXT_PUBLIC_SITE_URL: http://localhost:3080
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      API_URL: http://api:8080
+    ports:
+      - "3080:3000"
+
+volumes:
+  db-data:
