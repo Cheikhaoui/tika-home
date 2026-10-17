@@ -5,6 +5,7 @@ import com.tikahome.repository.ChannelRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +26,9 @@ public class ChannelSyncJob {
 
     /** fixedDelay: the next run starts only after the previous one finished, so runs never overlap. */
     @Scheduled(fixedDelayString = "${tikahome.ical.sync-interval}", initialDelayString = "${tikahome.ical.initial-delay}")
+    // lockAtMostFor: lock released even if this instance crashes mid-run; lockAtLeastFor: another
+    // instance whose clock fires a few seconds later doesn't sync again right after us.
+    @SchedulerLock(name = "channelSync", lockAtMostFor = "PT10M", lockAtLeastFor = "PT1M")
     public void syncAll() {
         for (Channel channel : channels.findByEnabledTrue()) {
             try {
