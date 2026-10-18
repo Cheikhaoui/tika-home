@@ -88,6 +88,26 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                 .body(problem);
     }
 
+    @ExceptionHandler(AssistantLimitException.class)
+    ResponseEntity<ProblemDetail> handleAssistantLimit(AssistantLimitException ex) {
+        var problem = ProblemDetail.forStatusAndDetail(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage());
+        problem.setProperty("limit", ex.getLimit());
+        var response = ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS);
+        if (ex.getRetryAfter() != null) {
+            problem.setProperty("retryAfter", ex.getRetryAfter());
+            long seconds = Math.max(1, Duration.between(Instant.now(), ex.getRetryAfter()).toSeconds());
+            response.header(HttpHeaders.RETRY_AFTER, String.valueOf(seconds));
+        }
+        return response.body(problem);
+    }
+
+    @ExceptionHandler(AssistantUnavailableException.class)
+    ProblemDetail handleAssistantUnavailable(AssistantUnavailableException ex) {
+        var problem = ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
+        problem.setProperty("reason", ex.getReason());
+        return problem;
+    }
+
     @ExceptionHandler(BookingRejectedException.class)
     ProblemDetail handleBookingRejected(BookingRejectedException ex) {
         var status = ex.isDateConflict() ? HttpStatus.CONFLICT : HttpStatus.UNPROCESSABLE_CONTENT;

@@ -52,6 +52,8 @@ services:
       ADMIN_BOOTSTRAP_EMAIL: admin@tikahome.test
       ADMIN_BOOTSTRAP_PASSWORD: compose-full-admin-password
       ADMIN_COOKIE_SECURE: "true" # browsers accept Secure cookies on http://localhost
+      ASSISTANT_VISITOR_HASH_SECRET: compose-full-placeholder-visitor-hash-0123456789
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-} # from your shell; empty = assistant hidden
 
   web:
     build:

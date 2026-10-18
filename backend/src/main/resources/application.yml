@@ -75,3 +75,6 @@ tikahome:
     bootstrap-password: local-dev-password
     cookie-secure: false # http://localhost; true (HTTPS only) in production
     allowed-origins: http://localhost:3000
+  assistant:
+    # Local development only; production: ASSISTANT_VISITOR_HASH_SECRET.
+    visitor-hash-secret: local-dev-only-visitor-hash-secret-0123456789

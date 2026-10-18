@@ -47,6 +47,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/properties/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/bookings").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/properties/*/assistant/chat").permitAll()
                         .requestMatchers(HttpMethod.GET, "/ical/*").permitAll() // secret token in the path
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/actuator/health", "/actuator/health/**").permitAll()

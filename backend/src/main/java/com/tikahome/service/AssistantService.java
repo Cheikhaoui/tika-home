@@ -100,7 +100,8 @@ public class AssistantService {
     public AssistantResult reply(UUID propertyId, List<ChatTurn> history, String question, String language,
                                  Consumer<String> onText) {
         if (!isConfigured()) {
-            throw new AssistantUnavailableException("The assistant is not configured (ANTHROPIC_API_KEY)");
+            throw new AssistantUnavailableException(AssistantUnavailableException.Reason.NOT_CONFIGURED,
+                    "The assistant is not configured (ANTHROPIC_API_KEY)");
         }
         List<BetaMessageParam> messages = new ArrayList<>(replay(history));
         messages.add(userMessage(firstUserTurn(question, language, retriever.retrieve(question))));
@@ -133,7 +134,8 @@ public class AssistantService {
             log.warn("Assistant stopped after {} calls without a final answer", MAX_CALLS);
             return new AssistantResult(answer.toString(), toolsUsed, usage, false);
         } catch (AnthropicException e) {
-            throw new AssistantUnavailableException("Claude is unavailable: " + e.getClass().getSimpleName(), e);
+            throw new AssistantUnavailableException(AssistantUnavailableException.Reason.CLAUDE_ERROR,
+                    "Claude is unavailable: " + e.getClass().getSimpleName(), e);
         }
     }
 

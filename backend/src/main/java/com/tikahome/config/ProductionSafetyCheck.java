@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * Refuses to start in production with settings that are only acceptable locally: the development
- * JWT secret and admin password are public in the Git repository, and the session cookie must be Secure.
+ * JWT secret, admin password and visitor hash key are public in the Git repository, and the session cookie must be Secure.
  */
 @Component
 @Profile("prod")
@@ -20,21 +20,25 @@ public class ProductionSafetyCheck implements ApplicationRunner {
 
     private final AdminProperties admin;
     private final NotificationProperties notifications;
+    private final AssistantProperties assistant;
 
-    public ProductionSafetyCheck(AdminProperties admin, NotificationProperties notifications) {
+    public ProductionSafetyCheck(AdminProperties admin, NotificationProperties notifications,
+                                 AssistantProperties assistant) {
         this.admin = admin;
         this.notifications = notifications;
+        this.assistant = assistant;
     }
 
     @Override
     public void run(ApplicationArguments args) {
-        List<String> problems = problems(admin, notifications);
+        List<String> problems = problems(admin, notifications, assistant);
         if (!problems.isEmpty()) {
             throw new IllegalStateException("Unsafe production configuration: " + String.join("; ", problems));
         }
     }
 
-    static List<String> problems(AdminProperties admin, NotificationProperties notifications) {
+    static List<String> problems(AdminProperties admin, NotificationProperties notifications,
+                                 AssistantProperties assistant) {
         List<String> problems = new ArrayList<>();
         if (admin.jwtSecret() == null || admin.jwtSecret().contains(DEV_MARKER) || admin.jwtSecret().length() < 32) {
             problems.add("ADMIN_JWT_SECRET must be a random value of at least 32 characters (not the dev one)");
@@ -48,6 +52,10 @@ public class ProductionSafetyCheck implements ApplicationRunner {
         if (notifications.siteUrl() == null || !notifications.siteUrl().startsWith("https://")
                 && !notifications.siteUrl().startsWith("http://localhost")) {
             problems.add("SITE_URL must be an https:// URL");
+        }
+        String visitorSecret = assistant.visitorHashSecret();
+        if (visitorSecret == null || visitorSecret.contains(DEV_MARKER) || visitorSecret.length() < 32) {
+            problems.add("ASSISTANT_VISITOR_HASH_SECRET must be a random value of at least 32 characters");
         }
         return problems;
     }

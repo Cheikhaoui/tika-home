@@ -45,3 +45,5 @@ tikahome:
     allowed-origins: ${SITE_URL}
   ical:
     allow-http: false
+  assistant:
+    visitor-hash-secret: ${ASSISTANT_VISITOR_HASH_SECRET} # random, at least 32 characters

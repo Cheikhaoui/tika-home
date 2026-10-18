@@ -193,6 +193,8 @@ secrets, a non-Secure cookie or a non-https site URL.
 | `SITE_URL` | `https://yourdomain` (also the allowed origin for admin requests) |
 | `ADMIN_JWT_SECRET` | random, at least 32 characters |
 | `ADMIN_BOOTSTRAP_EMAIL`, `ADMIN_BOOTSTRAP_PASSWORD` | only for the very first start |
+| `ASSISTANT_VISITOR_HASH_SECRET` | random, at least 32 characters (anonymises visitor IPs for the assistant's rate limits) |
+| `ANTHROPIC_API_KEY` | optional: without it the AI assistant is hidden |
 
 Website image: `API_URL` (runtime, e.g. `http://api:8080`); `NEXT_PUBLIC_SITE_URL` and
 `NEXT_PUBLIC_PROPERTY_ID` are **build arguments** (frozen into the prerendered pages).

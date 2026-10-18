@@ -25,5 +25,7 @@ public record AssistantProperties(
         /* Abuse and cost protection. */
         @DefaultValue("20") int maxMessagesPerHourPerVisitor,
         @DefaultValue("30") int maxMessagesPerConversation,
-        @DefaultValue("5.00") BigDecimal dailyBudgetUsd) {
+        @DefaultValue("5.00") BigDecimal dailyBudgetUsd,
+        /* Key of the HMAC that turns a visitor's IP address into an anonymous id (env variable in production). */
+        String visitorHashSecret) {
 }

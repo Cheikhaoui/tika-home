@@ -49,7 +49,7 @@ class AssistantServiceTest {
     final AssistantTools tools = new AssistantTools(quoteService, mock(AvailabilityService.class));
     final FakeClaude claude = new FakeClaude();
     final AssistantProperties properties = new AssistantProperties("m", "t", "/tmp", 4, 0.35,
-            "claude-opus-5-5", "low", 2048, 20, 30, new BigDecimal("5.00"));
+            "claude-opus-5-5", "low", 2048, 20, 30, new BigDecimal("5.00"), "test-fixture-visitor-key");
     final Clock clock = Clock.fixed(Instant.parse("2027-03-01T10:00:00Z"), ZoneOffset.UTC);
 
     AssistantService service(String apiKey) {
