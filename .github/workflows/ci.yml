@@ -28,6 +28,11 @@ jobs:
           distribution: temurin
           java-version: "25"
           cache: maven
+      # The assistant's local embedding model (~135 MB from Hugging Face): download once, reuse.
+      - uses: actions/cache@v6
+        with:
+          path: ~/.cache/tikahome/models
+          key: embedding-model-paraphrase-multilingual-MiniLM-L12-v2-quantized
       # verify = unit tests (Surefire) + Testcontainers integration tests (Failsafe); Docker is available.
       - run: ./mvnw -B verify
       - name: Test reports
