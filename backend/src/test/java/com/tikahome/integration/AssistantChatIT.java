@@ -81,6 +81,7 @@ class AssistantChatIT {
 
         assertThat(first.statusCode()).isEqualTo(200);
         assertThat(first.headers().firstValue("Content-Type").orElseThrow()).startsWith("text/event-stream");
+        assertThat(first.headers().firstValue("Cache-Control")).hasValue("no-cache, no-transform");
         assertThat(first.body())
                 .contains("event:start", "event:delta", "\"text\":\"Yes, there is \"", "\"text\":\"a pool.\"",
                         "event:done", "\"refused\":false")

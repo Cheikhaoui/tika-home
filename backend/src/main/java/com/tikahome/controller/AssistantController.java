@@ -12,7 +12,9 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -55,7 +57,7 @@ public class AssistantController {
     @Operation(summary = "Ask the assistant. Server-Sent Events: start {conversationId}, delta {text}..., "
             + "then done {refused} or error {reason}. 429 when a rate limit is hit, 503 when unavailable.")
     @PostMapping("/api/properties/{propertyId}/assistant/chat")
-    public SseEmitter chat(@PathVariable UUID propertyId, @Valid @RequestBody AssistantChatRequest request,
+    public ResponseEntity<SseEmitter> chat(@PathVariable UUID propertyId, @Valid @RequestBody AssistantChatRequest request,
                            HttpServletRequest http) {
         // Behind the website proxy, getRemoteAddr() is the visitor's address thanks to X-Forwarded-For
         // (server.forward-headers-strategy in production). It is only used hashed, for rate limits.
@@ -64,7 +66,12 @@ public class AssistantController {
 
         SseEmitter emitter = new SseEmitter(STREAM_TIMEOUT.toMillis());
         executor.execute(() -> stream(context, emitter));
-        return emitter;
+        // Every layer between here and the browser (Next.js proxy, nginx, CDN) must pass each event on
+        // at once: no caching, no compression (it buffers), no proxy buffering.
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-transform")
+                .header("X-Accel-Buffering", "no")
+                .body(emitter);
     }
 
     private void stream(ChatContext context, SseEmitter emitter) {
