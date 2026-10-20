@@ -192,10 +192,25 @@
 					</compilerArgs>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<!-- Tests never use a real Anthropic key (it would cost money): this beats the local .env -->
+					<environmentVariables>
+						<ANTHROPIC_API_KEY></ANTHROPIC_API_KEY>
+					</environmentVariables>
+				</configuration>
+			</plugin>
 			<!-- Runs *IT classes (Testcontainers integration tests) during `mvn verify`. -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
+				<configuration>
+					<environmentVariables>
+						<ANTHROPIC_API_KEY></ANTHROPIC_API_KEY>
+					</environmentVariables>
+				</configuration>
 				<executions>
 					<execution>
 						<goals>

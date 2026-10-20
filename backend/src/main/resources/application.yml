@@ -22,6 +22,10 @@ management:
 spring:
   application:
     name: tikahome-backend
+  config:
+    # Local secrets (ANTHROPIC_API_KEY) from the git-ignored .env at the repository root, if present
+    # (run from backend/ or from the root). In production the variables come from the environment.
+    import: "optional:file:../.env[.properties],optional:file:.env[.properties]"
   datasource:
     url: jdbc:postgresql://localhost:5433/tikahome
     username: tikahome
