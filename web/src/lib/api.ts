@@ -1,5 +1,5 @@
 // Typed client for the Spring Boot API. The browser calls /api/... on our own domain and
-// Next.js forwards it to the backend (see rewrites in next.config.ts).
+// Next.js forwards it to the backend (see src/proxy.ts).
 import type { IsoDate } from "./dates";
 
 export type QuoteIssue =
@@ -71,6 +71,10 @@ export type Problem = {
   detail?: string;
   issues?: QuoteIssue[];
   errors?: Record<string, string>;
+  /** Assistant: why it is unavailable (503) or which limit was hit (429), and when to retry. */
+  reason?: "NOT_CONFIGURED" | "DAILY_BUDGET" | "CLAUDE_ERROR";
+  limit?: "HOURLY" | "CONVERSATION";
+  retryAfter?: string;
 };
 
 export class ApiError extends Error {
@@ -107,6 +111,9 @@ export const api = {
       `/properties/${propertyId}/quote?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}`,
       { signal },
     ),
+
+  assistantStatus: (propertyId: string, signal?: AbortSignal) =>
+    request<{ available: boolean }>(`/properties/${propertyId}/assistant`, { signal }),
 
   createBooking: (body: BookingRequest) =>
     request<Booking>("/bookings", { method: "POST", body: JSON.stringify(body) }),

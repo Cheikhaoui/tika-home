@@ -256,5 +256,33 @@
     "label": "Discutez avec nous sur WhatsApp",
     "short": "WhatsApp",
     "message": "Bonjour ! Je suis intéressé(e) par un séjour à Tika Home à Marrakech."
+  },
+  "assistant": {
+    "open": "Posez une question à notre assistant",
+    "short": "Une question ?",
+    "title": "Assistant Tika Home",
+    "subtitle": "Assistant IA · il peut se tromper",
+    "close": "Fermer l’assistant",
+    "newChat": "Nouvelle conversation",
+    "welcome": "Bonjour ! Je peux répondre à vos questions sur la maison, votre séjour et Marrakech, et vérifier les dates et les prix pour vous.",
+    "suggestions": [
+      "La piscine est-elle chauffée ?",
+      "La maison est-elle libre le week-end prochain ?",
+      "Comment venir depuis l’aéroport ?"
+    ],
+    "suggestionsLabel": "Exemples de questions",
+    "inputLabel": "Votre question",
+    "placeholder": "Posez votre question…",
+    "send": "Envoyer",
+    "writing": "Rédaction…",
+    "you": "Vous",
+    "assistant": "Assistant",
+    "privacy": "Les conversations sont enregistrées pour que le propriétaire puisse améliorer les réponses. Ne partagez pas de données de paiement.",
+    "errors": {
+      "generic": "Désolé, je n’ai pas pu répondre. Réessayez, ou contactez-nous sur WhatsApp.",
+      "hourly": "Vous avez envoyé beaucoup de messages. Réessayez un peu plus tard, ou contactez-nous sur WhatsApp.",
+      "conversation": "Cette conversation devient longue. Commencez-en une nouvelle.",
+      "budget": "L’assistant se repose jusqu’à demain. Contactez-nous sur WhatsApp."
+    }
   }
 }

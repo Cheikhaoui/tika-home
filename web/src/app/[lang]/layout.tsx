@@ -4,7 +4,8 @@ import { direction, locales } from "@/i18n/config";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
-import { siteUrl } from "@/config/site";
+import { ChatAssistant } from "@/components/assistant/ChatAssistant";
+import { propertyId, siteUrl } from "@/config/site";
 import { heroPhoto } from "@/content/photos";
 import { languageAlternates, ogLocale } from "@/lib/seo";
 import { getDictionary, getLocale } from "./dictionaries";
@@ -68,6 +69,8 @@ export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
         </main>
         <Footer dict={dict} locale={locale} />
         <WhatsAppButton dict={dict} />
+        {/* Only the assistant texts are sent to the browser, not the whole dictionary. */}
+        <ChatAssistant locale={locale} propertyId={propertyId} labels={dict.assistant} />
       </body>
     </html>
   );
