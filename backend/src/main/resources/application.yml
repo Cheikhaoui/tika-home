@@ -80,5 +80,6 @@ tikahome:
     cookie-secure: false # http://localhost; true (HTTPS only) in production
     allowed-origins: http://localhost:3000
   assistant:
+    model-cache-directory: ${user.home}/.cache/tikahome/models # ~135 MB embedding model, downloaded once
     # Local development only; production: ASSISTANT_VISITOR_HASH_SECRET.
     visitor-hash-secret: local-dev-only-visitor-hash-secret-0123456789

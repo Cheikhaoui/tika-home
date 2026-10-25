@@ -12,6 +12,9 @@
 
 # Backend
 backend/target/
+# Downloaded AI models (> 100 MB): never in Git, they are fetched at startup / Docker build
+*.onnx
+**/.cache/
 backend/.mvn/wrapper/maven-wrapper.jar
 
 # Web

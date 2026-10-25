@@ -13,8 +13,9 @@ public record AssistantProperties(
         String embeddingModelUri,
         @DefaultValue("https://huggingface.co/Xenova/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/tokenizer.json")
         String embeddingTokenizerUri,
-        /* Where downloaded model files are kept between restarts. */
-        @DefaultValue("${user.home}/.cache/tikahome/models") String modelCacheDirectory,
+        /* Where downloaded model files are kept between restarts. Set in application.yml: @DefaultValue does
+           NOT resolve ${...} placeholders (it would create a folder literally named "${user.home}"). */
+        String modelCacheDirectory,
         /* Knowledge base: chunks retrieved per question, and the minimum cosine similarity to keep one. */
         @DefaultValue("4") int retrievalTopK,
         @DefaultValue("0.35") double retrievalMinSimilarity,
