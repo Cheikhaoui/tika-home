@@ -21,7 +21,7 @@
 		<mapstruct.version>1.6.3</mapstruct.version>
 		<shedlock.version>7.10.1</shedlock.version>
 		<spring-ai.version>2.0.1</spring-ai.version>
-		<anthropic.version>2.73.0</anthropic.version>
+		<anthropic.version>3.3.0</anthropic.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
